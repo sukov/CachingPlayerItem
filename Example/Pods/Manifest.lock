@@ -1,0 +1,27 @@
+PODS:
+  - CachingPlayerItem (1.0.0)
+  - Nimble (9.0.0)
+  - Quick (3.0.0)
+
+DEPENDENCIES:
+  - CachingPlayerItem (from `../`)
+  - Nimble (~> 9.0.0)
+  - Quick (~> 3.0.0)
+
+SPEC REPOS:
+  trunk:
+    - Nimble
+    - Quick
+
+EXTERNAL SOURCES:
+  CachingPlayerItem:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  CachingPlayerItem: 9fa2184c210421554d0bf1faeba219efa90dddcb
+  Nimble: 3b4ec3fd40f1dc178058e0981107721c615643d8
+  Quick: 6d9559f40647bc4d510103842ef2fdd882d753e2
+
+PODFILE CHECKSUM: 1cdcce4b212dfd05c15b6034f9ccfd48557453b6
+
+COCOAPODS: 1.9.3

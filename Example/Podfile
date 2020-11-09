@@ -1,0 +1,13 @@
+use_frameworks!
+platform :ios, '10.0'
+
+target 'CachingPlayerItem_Example' do
+  pod 'CachingPlayerItem', :path => '../'
+
+  target 'CachingPlayerItem_Tests' do
+    inherit! :search_paths
+
+    pod 'Quick', '~> 3.0.0'
+    pod 'Nimble', '~> 9.0.0'
+  end
+end

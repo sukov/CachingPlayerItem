@@ -1,0 +1,6 @@
+framework module CachingPlayerItem {
+  umbrella header "CachingPlayerItem-umbrella.h"
+
+  export *
+  module * { export * }
+}
