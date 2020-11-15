@@ -21,6 +21,7 @@ final class ResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URL
     private var session: URLSession?
     private var response: URLResponse?
     private var pendingRequests = Set<AVAssetResourceLoadingRequest>()
+    private var isDownloadComplete = false
 
     private let url: URL
     private let saveFilePath: String
@@ -32,6 +33,9 @@ final class ResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URL
         self.url = url
         self.saveFilePath = saveFilePath
         self.owner = owner
+        super.init()
+
+        NotificationCenter.default.addObserver(self, selector: #selector(handleAppWillTerminate), name: UIApplication.willTerminateNotification, object: nil)
     }
 
     deinit {
@@ -168,6 +172,8 @@ final class ResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URL
             fileHandle.append(data: bufferData)
         }
 
+        isDownloadComplete = true
+
         DispatchQueue.main.async {
             self.owner?.delegate?.playerItem?(self.owner!, didFinishDownloadingFileAt: self.saveFilePath)
         }
@@ -179,5 +185,12 @@ final class ResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URL
         DispatchQueue.main.async {
             self.owner?.delegate?.playerItem?(self.owner!, downloadingFailedWith: error)
         }
+    }
+
+    @objc private func handleAppWillTerminate() {
+        // We need to only remove the file if it hasn't been fully downloaded
+        guard isDownloadComplete == false else { return }
+
+        fileHandle.deleteFile()
     }
 }
