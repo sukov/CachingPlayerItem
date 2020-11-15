@@ -7,6 +7,7 @@
 
 import Foundation
 
+/// CachingPlayerItem global configuration.
 public enum CachingPlayerItemConfiguration {
     /// How much data is downloaded in memory before stored on a file.
     public static var downloadBufferLimit: Int = 128.KB

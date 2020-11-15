@@ -7,6 +7,7 @@
 
 import Foundation
 
+/// File handle for local file operations.
 final class MediaFileHandle {
     private let filePath: String
     private lazy var readHandle = FileHandle(forReadingAtPath: filePath)

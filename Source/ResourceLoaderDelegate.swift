@@ -8,6 +8,7 @@
 import Foundation
 import AVFoundation
 
+/// Responsible for downloading media data and providing the requested data parts.
 final class ResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URLSessionDelegate, URLSessionDataDelegate, URLSessionTaskDelegate {
     private let lock = NSLock()
 

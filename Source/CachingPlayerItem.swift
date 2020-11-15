@@ -8,6 +8,7 @@
 import Foundation
 import AVFoundation
 
+/// Convenient delegate methods for `CachingPlayerItem` status updates.
 @objc public protocol CachingPlayerItemDelegate {
     // MARK: Downloading delegate methods
 
@@ -32,6 +33,7 @@ import AVFoundation
     @objc optional func playerItemPlaybackStalled(_ playerItem: CachingPlayerItem)
 }
 
+/// AVPlayerItem subclass that supports caching while playing.
 public final class CachingPlayerItem: AVPlayerItem {
     private let cachingPlayerItemScheme = "cachingPlayerItemScheme"
 
@@ -72,7 +74,7 @@ public final class CachingPlayerItem: AVPlayerItem {
 
      - parameter url: URL referencing the media file.
 
-     - parameter saveFilePath: The desired local save location.
+     - parameter saveFilePath: The desired local save location. E.g. "video.mp4". **Must** be a unique file path that doesn't already exist. If a file exists at the path than it's **required** to be empty (contain no data).
 
      - parameter customFileExtension: Media file extension. E.g. mp4, mp3. This is required for the player to work correctly with the intended file type.
      */
