@@ -30,7 +30,6 @@ final class MediaFileHandle {
     deinit {
         guard FileManager.default.fileExists(atPath: filePath) else { return }
 
-        synchronize()
         close()
     }
 }
@@ -84,9 +83,6 @@ extension MediaFileHandle {
     }
 
     func deleteFile() {
-        synchronize()
-        close()
-
         do {
             try FileManager.default.removeItem(atPath: filePath)
         } catch let error {
