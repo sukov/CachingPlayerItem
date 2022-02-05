@@ -1,0 +1,19 @@
+{
+  "warnings": [
+    {
+      "file": "/Users/shukov/Projects/CachingPlayerItem/Source/CachingPlayerItem.swift",
+      "line": 48,
+      "symbol": "CachingPlayerItem.delegate",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/shukov/Projects/CachingPlayerItem/Source/CachingPlayerItem.swift",
+      "line": 203,
+      "symbol": "CachingPlayerItem.observeValue(forKeyPath:of:change:context:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    }
+  ],
+  "source_directory": "/Users/shukov/Projects/CachingPlayerItem"
+}

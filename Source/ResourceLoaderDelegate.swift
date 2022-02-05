@@ -83,9 +83,14 @@ final class ResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URL
             return
         }
 
-        if let response = response as? HTTPURLResponse, response.statusCode >= 400 {
-            let error = NSError(domain: "Failed downloading asset", code: response.statusCode, userInfo: nil)
-            downloadFailed(with: error)
+        if bufferData.count > 0 {
+            fileHandle.append(data: bufferData)
+        }
+
+        let error = verifyResponse()
+
+        guard error == nil else {
+            downloadFailed(with: error!)
             return
         }
 
@@ -165,10 +170,6 @@ final class ResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URL
     }
 
     private func downloadComplete() {
-        if bufferData.count > 0 {
-            fileHandle.append(data: bufferData)
-        }
-
         processPendingRequests()
 
         isDownloadComplete = true
@@ -176,6 +177,24 @@ final class ResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URL
         DispatchQueue.main.async {
             self.owner?.delegate?.playerItem?(self.owner!, didFinishDownloadingFileAt: self.saveFilePath)
         }
+    }
+
+    private func verifyResponse() -> NSError? {
+        guard let response = response as? HTTPURLResponse else { return nil }
+
+        let shouldVerifyDownloadedFileSize = CachingPlayerItemConfiguration.shouldVerifyDownloadedFileSize
+        let minimumExpectedFileSize = CachingPlayerItemConfiguration.minimumExpectedFileSize
+        var error: NSError?
+
+        if response.statusCode >= 400 {
+            error = NSError(domain: "Failed downloading asset. Reason: response status code \(response.statusCode).", code: response.statusCode, userInfo: nil)
+        } else if shouldVerifyDownloadedFileSize && response.expectedContentLength != -1 && response.expectedContentLength != fileHandle.fileSize {
+            error = NSError(domain: "Failed downloading asset. Reason: wrong file size, expected: \(response.expectedContentLength), actual: \(fileHandle.fileSize).", code: response.statusCode, userInfo: nil)
+        } else if minimumExpectedFileSize > 0 && minimumExpectedFileSize > fileHandle.fileSize {
+            error = NSError(domain: "Failed downloading asset. Reason: wrong file size, expected: \(response.expectedContentLength), actual: \(fileHandle.fileSize).", code: response.statusCode, userInfo: nil)
+        }
+
+        return error
     }
 
     private func downloadFailed(with error: Error) {
