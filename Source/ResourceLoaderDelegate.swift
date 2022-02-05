@@ -46,7 +46,7 @@ final class ResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URL
 
     func resourceLoader(_ resourceLoader: AVAssetResourceLoader, shouldWaitForLoadingOfRequestedResource loadingRequest: AVAssetResourceLoadingRequest) -> Bool {
         if session == nil {
-            // If we're playing from a url, we need to download the file.
+            // If we're playing from an url, we need to download the file.
             // We start loading the file on first request only.
             startDataRequest(with: url)
         }
@@ -130,7 +130,6 @@ final class ResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URL
         // Do we have response from the server?
         guard let response = response else { return }
 
-
         contentInformationRequest?.contentType = response.mimeType
         contentInformationRequest?.contentLength = response.expectedContentLength
         contentInformationRequest?.isByteRangeAccessSupported = true
@@ -166,11 +165,11 @@ final class ResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URL
     }
 
     private func downloadComplete() {
-        processPendingRequests()
-
         if bufferData.count > 0 {
             fileHandle.append(data: bufferData)
         }
+
+        processPendingRequests()
 
         isDownloadComplete = true
 
