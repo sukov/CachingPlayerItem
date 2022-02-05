@@ -7,7 +7,7 @@ target 'CachingPlayerItem_Example' do
   target 'CachingPlayerItem_Tests' do
     inherit! :search_paths
 
-    pod 'Quick', '~> 3.0.0'
-    pod 'Nimble', '~> 9.0.0'
+    pod 'Quick', '~> 4.0.0'
+    pod 'Nimble', '~> 9.2.0'
   end
 end
