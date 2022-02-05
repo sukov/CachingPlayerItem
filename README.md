@@ -17,6 +17,7 @@ CachingPlayerItem is a subclass of AVPlayerItem that lets you stream and cache m
 - [x] `CachingPlayerItem` is a subclass of `AVPlayerItem`, so you can use it in the same manner as `AVPlayerItem` and take the full advantage of `AVFoundation` Framework
 - [x] Configurable downloadBufferLimit / readDataLimit through `CachingPlayerItemConfiguration`
 - [x] Play remote media without caching and still make use of `CachingPlayerItemDelegate`
+- [x] [Complete Documentation](https://sukov.github.io/CachingPlayerItem/)
 
 ## Requirements
 
