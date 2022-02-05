@@ -1,0 +1,7 @@
+author: Gorjan Shukov
+github_url: https://github.com/sukov/CachingPlayerItem
+root_url: https://sukov.github.io/CachingPlayerItem/
+output: docs
+theme: fullwidth
+xcodebuild_arguments: [-workspace, 'Example/CachingPlayerItem.xcworkspace', -scheme, 'CachingPlayerItem', -destination, generic/platform=iOS]
+

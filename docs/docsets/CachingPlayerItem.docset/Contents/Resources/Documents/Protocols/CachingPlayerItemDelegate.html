@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>CachingPlayerItemDelegate Protocol Reference</title>
+    <link rel="stylesheet" type="text/css" href="../css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="../css/highlight.css" />
+    <meta charset="utf-8">
+    <script src="../js/jquery.min.js" defer></script>
+    <script src="../js/jazzy.js" defer></script>
+    
+    <script src="../js/lunr.min.js" defer></script>
+    <script src="../js/typeahead.jquery.js" defer></script>
+    <script src="../js/jazzy.search.js" defer></script>
+  </head>
+  <body>
+
+    <a name="//apple_ref/swift/Protocol/CachingPlayerItemDelegate" class="dashAnchor"></a>
+
+    <a title="CachingPlayerItemDelegate Protocol Reference"></a>
+
+    <header class="header">
+      <p class="header-col header-col--primary">
+        <a class="header-link" href="../index.html">
+          CachingPlayerItem 1.0.3 Docs
+        </a>
+         (90% documented)
+      </p>
+    
+      <div class="header-col--secondary">
+        <form role="search" action="../search.json">
+          <input type="text" placeholder="Search documentation" data-typeahead>
+        </form>
+      </div>
+    
+        <p class="header-col header-col--secondary">
+          <a class="header-link" href="https://github.com/sukov/CachingPlayerItem">
+            <img class="header-icon" src="../img/gh.png" alt="GitHub"/>
+            View on GitHub
+          </a>
+        </p>
+    
+        <p class="header-col header-col--secondary">
+          <a class="header-link" href="dash-feed://https%3A%2F%2Fsukov.github.io%2FCachingPlayerItem%2Fdocsets%2FCachingPlayerItem.xml">
+            <img class="header-icon" src="../img/dash.png" alt="Dash"/>
+            Install in Dash
+          </a>
+        </p>
+    </header>
+
+    <p class="breadcrumbs">
+      <a class="breadcrumb" href="../index.html">CachingPlayerItem Reference</a>
+      <img class="carat" src="../img/carat.png" alt=""/>
+      CachingPlayerItemDelegate Protocol Reference
+    </p>
+
+    <div class="content-wrapper">
+      <nav class="navigation">
+        <ul class="nav-groups">
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Classes.html">Classes</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/CachingPlayerItem.html">CachingPlayerItem</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Enums.html">Enumerations</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/CachingPlayerItemConfiguration.html">CachingPlayerItemConfiguration</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Protocols.html">Protocols</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/CachingPlayerItemDelegate.html">CachingPlayerItemDelegate</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+
+        <section class="section">
+          <div class="section-content top-matter">
+            <h1>CachingPlayerItemDelegate</h1>
+              <div class="declaration">
+                <div class="language">
+                  
+                  <pre class="highlight swift"><code><span class="kd">@objc</span>
+<span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">CachingPlayerItemDelegate</span></code></pre>
+
+                </div>
+              </div>
+            <p>Convenient delegate methods for <code><a href="../Classes/CachingPlayerItem.html">CachingPlayerItem</a></code> status updates.</p>
+
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-content">
+            <div class="task-group">
+              <div class="task-name-container">
+                <a name="/Downloading%20delegate%20methods"></a>
+                <a name="//apple_ref/swift/Section/Downloading delegate methods" class="dashAnchor"></a>
+                <div class="section-name-container">
+                  <a class="section-name-link" href="#/Downloading%20delegate%20methods"></a>
+                  <h3 class="section-name"><span>Downloading delegate methods</span>
+</h3>
+                </div>
+              </div>
+              <ul class="item-container">
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/c:@M@CachingPlayerItem@objc(pl)CachingPlayerItemDelegate(im)playerItem:didFinishDownloadingFileAt:"></a>
+                    <a name="//apple_ref/swift/Method/playerItem(_:didFinishDownloadingFileAt:)" class="dashAnchor"></a>
+                    <a class="token" href="#/c:@M@CachingPlayerItem@objc(pl)CachingPlayerItemDelegate(im)playerItem:didFinishDownloadingFileAt:">playerItem(_:<wbr>didFinishDownloadingFileAt:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Called when the media file is fully downloaded.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">@objc</span>
+<span class="kd">optional</span> <span class="kd">func</span> <span class="nf">playerItem</span><span class="p">(</span><span class="n">_</span> <span class="nv">playerItem</span><span class="p">:</span> <span class="kt"><a href="../Classes/CachingPlayerItem.html">CachingPlayerItem</a></span><span class="p">,</span> <span class="n">didFinishDownloadingFileAt</span> <span class="nv">filePath</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/c:@M@CachingPlayerItem@objc(pl)CachingPlayerItemDelegate(im)playerItem:didDownloadBytesSoFar:outOf:"></a>
+                    <a name="//apple_ref/swift/Method/playerItem(_:didDownloadBytesSoFar:outOf:)" class="dashAnchor"></a>
+                    <a class="token" href="#/c:@M@CachingPlayerItem@objc(pl)CachingPlayerItemDelegate(im)playerItem:didDownloadBytesSoFar:outOf:">playerItem(_:<wbr>didDownloadBytesSoFar:<wbr>outOf:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Called every time a new portion of data is received.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">@objc</span>
+<span class="kd">optional</span> <span class="kd">func</span> <span class="nf">playerItem</span><span class="p">(</span><span class="n">_</span> <span class="nv">playerItem</span><span class="p">:</span> <span class="kt"><a href="../Classes/CachingPlayerItem.html">CachingPlayerItem</a></span><span class="p">,</span> <span class="n">didDownloadBytesSoFar</span> <span class="nv">bytesDownloaded</span><span class="p">:</span> <span class="kt">Int</span><span class="p">,</span> <span class="n">outOf</span> <span class="nv">bytesExpected</span><span class="p">:</span> <span class="kt">Int</span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/c:@M@CachingPlayerItem@objc(pl)CachingPlayerItemDelegate(im)playerItem:downloadingFailedWith:"></a>
+                    <a name="//apple_ref/swift/Method/playerItem(_:downloadingFailedWith:)" class="dashAnchor"></a>
+                    <a class="token" href="#/c:@M@CachingPlayerItem@objc(pl)CachingPlayerItemDelegate(im)playerItem:downloadingFailedWith:">playerItem(_:<wbr>downloadingFailedWith:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Called on downloading error.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">@objc</span>
+<span class="kd">optional</span> <span class="kd">func</span> <span class="nf">playerItem</span><span class="p">(</span><span class="n">_</span> <span class="nv">playerItem</span><span class="p">:</span> <span class="kt"><a href="../Classes/CachingPlayerItem.html">CachingPlayerItem</a></span><span class="p">,</span> <span class="n">downloadingFailedWith</span> <span class="nv">error</span><span class="p">:</span> <span class="kt">Error</span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="task-group">
+              <div class="task-name-container">
+                <a name="/Playing%20delegate%20methods"></a>
+                <a name="//apple_ref/swift/Section/Playing delegate methods" class="dashAnchor"></a>
+                <div class="section-name-container">
+                  <a class="section-name-link" href="#/Playing%20delegate%20methods"></a>
+                  <h3 class="section-name"><span>Playing delegate methods</span>
+</h3>
+                </div>
+              </div>
+              <ul class="item-container">
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/c:@M@CachingPlayerItem@objc(pl)CachingPlayerItemDelegate(im)playerItemReadyToPlay:"></a>
+                    <a name="//apple_ref/swift/Method/playerItemReadyToPlay(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/c:@M@CachingPlayerItem@objc(pl)CachingPlayerItemDelegate(im)playerItemReadyToPlay:">playerItemReadyToPlay(_:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Called after initial prebuffering is finished, means we are ready to play.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">@objc</span>
+<span class="kd">optional</span> <span class="kd">func</span> <span class="nf">playerItemReadyToPlay</span><span class="p">(</span><span class="n">_</span> <span class="nv">playerItem</span><span class="p">:</span> <span class="kt"><a href="../Classes/CachingPlayerItem.html">CachingPlayerItem</a></span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/c:@M@CachingPlayerItem@objc(pl)CachingPlayerItemDelegate(im)playerItemDidFailToPlay:withError:"></a>
+                    <a name="//apple_ref/swift/Method/playerItemDidFailToPlay(_:withError:)" class="dashAnchor"></a>
+                    <a class="token" href="#/c:@M@CachingPlayerItem@objc(pl)CachingPlayerItemDelegate(im)playerItemDidFailToPlay:withError:">playerItemDidFailToPlay(_:<wbr>withError:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Called when the player is unable to play the data/url.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">@objc</span>
+<span class="kd">optional</span> <span class="kd">func</span> <span class="nf">playerItemDidFailToPlay</span><span class="p">(</span><span class="n">_</span> <span class="nv">playerItem</span><span class="p">:</span> <span class="kt"><a href="../Classes/CachingPlayerItem.html">CachingPlayerItem</a></span><span class="p">,</span> <span class="n">withError</span> <span class="nv">error</span><span class="p">:</span> <span class="kt">Error</span><span class="p">?)</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/c:@M@CachingPlayerItem@objc(pl)CachingPlayerItemDelegate(im)playerItemPlaybackStalled:"></a>
+                    <a name="//apple_ref/swift/Method/playerItemPlaybackStalled(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/c:@M@CachingPlayerItem@objc(pl)CachingPlayerItemDelegate(im)playerItemPlaybackStalled:">playerItemPlaybackStalled(_:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Called when the data being downloaded did not arrive in time to continue playback.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">@objc</span>
+<span class="kd">optional</span> <span class="kd">func</span> <span class="nf">playerItemPlaybackStalled</span><span class="p">(</span><span class="n">_</span> <span class="nv">playerItem</span><span class="p">:</span> <span class="kt"><a href="../Classes/CachingPlayerItem.html">CachingPlayerItem</a></span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+      </article>
+    </div>
+    <section class="footer">
+      <p>&copy; 2022 <a class="link" href="https://github.com/sukov/CachingPlayerItem" target="_blank" rel="external noopener">Gorjan Shukov</a>. All rights reserved. (Last updated: 2022-02-05)</p>
+      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.14.1</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
+    </section>
+  </body>
+</html>

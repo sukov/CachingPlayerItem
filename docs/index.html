@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>CachingPlayerItem  Reference</title>
+    <link rel="stylesheet" type="text/css" href="css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="css/highlight.css" />
+    <meta charset="utf-8">
+    <script src="js/jquery.min.js" defer></script>
+    <script src="js/jazzy.js" defer></script>
+    
+    <script src="js/lunr.min.js" defer></script>
+    <script src="js/typeahead.jquery.js" defer></script>
+    <script src="js/jazzy.search.js" defer></script>
+  </head>
+  <body>
+
+
+    <a title="CachingPlayerItem  Reference"></a>
+
+    <header class="header">
+      <p class="header-col header-col--primary">
+        <a class="header-link" href="index.html">
+          CachingPlayerItem 1.0.3 Docs
+        </a>
+         (90% documented)
+      </p>
+    
+      <div class="header-col--secondary">
+        <form role="search" action="search.json">
+          <input type="text" placeholder="Search documentation" data-typeahead>
+        </form>
+      </div>
+    
+        <p class="header-col header-col--secondary">
+          <a class="header-link" href="https://github.com/sukov/CachingPlayerItem">
+            <img class="header-icon" src="img/gh.png" alt="GitHub"/>
+            View on GitHub
+          </a>
+        </p>
+    
+        <p class="header-col header-col--secondary">
+          <a class="header-link" href="dash-feed://https%3A%2F%2Fsukov.github.io%2FCachingPlayerItem%2Fdocsets%2FCachingPlayerItem.xml">
+            <img class="header-icon" src="img/dash.png" alt="Dash"/>
+            Install in Dash
+          </a>
+        </p>
+    </header>
+
+    <p class="breadcrumbs">
+      <a class="breadcrumb" href="index.html">CachingPlayerItem Reference</a>
+      <img class="carat" src="img/carat.png" alt=""/>
+      CachingPlayerItem  Reference
+    </p>
+
+    <div class="content-wrapper">
+      <nav class="navigation">
+        <ul class="nav-groups">
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="Classes.html">Classes</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Classes/CachingPlayerItem.html">CachingPlayerItem</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="Enums.html">Enumerations</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/CachingPlayerItemConfiguration.html">CachingPlayerItemConfiguration</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="Protocols.html">Protocols</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Protocols/CachingPlayerItemDelegate.html">CachingPlayerItemDelegate</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+
+        <section class="section">
+          <div class="section-content top-matter">
+            
+            <h1 id='cachingplayeritem' class='heading'>CachingPlayerItem</h1>
+
+<p>CachingPlayerItem is a subclass of AVPlayerItem that lets you stream and cache media content on iOS. Initial idea for this work was found <a href="https://github.com/neekeetab/CachingPlayerItem">here</a>.</p>
+
+<p><a href="https://travis-ci.org/sukov/CachingPlayerItem"><img src="https://img.shields.io/travis/sukov/CachingPlayerItem.svg?style=flat" alt="CI Status"></a>
+<a href="https://cocoapods.org/pods/CachingPlayerItem"><img src="https://img.shields.io/cocoapods/v/CachingPlayerItem.svg?style=flat" alt="Version"></a>
+<a href="https://cocoapods.org/pods/CachingPlayerItem"><img src="https://img.shields.io/cocoapods/l/CachingPlayerItem.svg?style=flat" alt="License"></a>
+<a href="https://swift.org"><img src="https://img.shields.io/badge/Language-Swift%205.0-orange.svg?style=flat" alt="Language Swift"></a>
+<a href="https://cocoapods.org/pods/CachingPlayerItem"><img src="https://img.shields.io/cocoapods/p/CachingPlayerItem.svg?style=flat" alt="Platform"></a></p>
+<h2 id='features' class='heading'>Features</h2>
+
+<ul>
+<li>[x] Playing and caching remote media</li>
+<li>[x] Downloaded data is buffered and stored on a file, therefore you won&rsquo;t have any RAM memory issues</li>
+<li>[x] Playing from a local file / data</li>
+<li>[x] Convenient notifications through <code><a href="Protocols/CachingPlayerItemDelegate.html">CachingPlayerItemDelegate</a></code> delegate</li>
+<li>[x] <code><a href="Classes/CachingPlayerItem.html">CachingPlayerItem</a></code> is a subclass of <code>AVPlayerItem</code>, so you can use it in the same manner as <code>AVPlayerItem</code> and take the full advantage of <code>AVFoundation</code> Framework</li>
+<li>[x] Configurable downloadBufferLimit / readDataLimit through <code><a href="Enums/CachingPlayerItemConfiguration.html">CachingPlayerItemConfiguration</a></code></li>
+<li>[x] Play remote media without caching and still make use of <code><a href="Protocols/CachingPlayerItemDelegate.html">CachingPlayerItemDelegate</a></code></li>
+</ul>
+<h2 id='requirements' class='heading'>Requirements</h2>
+
+<ul>
+<li>iOS 10.0+</li>
+<li>Xcode 12.0+</li>
+<li>Swift 5.0+</li>
+</ul>
+<h2 id='installation' class='heading'>Installation</h2>
+<h3 id='cocoapods' class='heading'>CocoaPods</h3>
+
+<p><a href="http://cocoapods.org">CocoaPods</a> is a dependency manager for Cocoa projects. You can install it with the following command:</p>
+<pre class="highlight shell"><code><span class="gp">$ </span>gem install cocoapods
+</code></pre>
+
+<p>To integrate CachingPlayerItem into your Xcode project using CocoaPods, specify it in your <code>Podfile</code>:</p>
+<pre class="highlight ruby"><code><span class="n">source</span> <span class="s1">'https://github.com/CocoaPods/Specs.git'</span>
+<span class="n">platform</span> <span class="ss">:ios</span><span class="p">,</span> <span class="s1">'10.0'</span>
+<span class="n">use_frameworks!</span>
+
+<span class="n">target</span> <span class="s1">'&lt;Your Target Name&gt;'</span> <span class="k">do</span>
+    <span class="n">pod</span> <span class="s1">'CachingPlayerItem'</span>
+<span class="k">end</span>
+</code></pre>
+<h2 id='usage' class='heading'>Usage</h2>
+<h3 id='quick-start' class='heading'>Quick Start</h3>
+<pre class="highlight plaintext"><code>import UIKit
+import AVFoundation
+import CachingPlayerItem
+
+class ViewController: UIViewController {
+    // You need to keep a strong reference to your player.
+    var player: AVPlayer!
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        let url = URL(string: "https://random-url.com/video.mp4")!
+        let playerItem = CachingPlayerItem(url: url)
+        player = AVPlayer(playerItem: playerItem)
+        player.automaticallyWaitsToMinimizeStalling = false
+        player.play()
+
+    }
+}
+</code></pre>
+
+<p><strong>From Apple docs: It&rsquo;s strongly recommended to set AVPlayer&rsquo;s property <code>automaticallyWaitsToMinimizeStalling</code> to <code>false</code>. Not doing so can lead to poor startup times for playback and poor recovery from stalls.</strong></p>
+
+<p>If you want to cache a file without playing it, or to preload it for future playing, use <code>download()</code> method:</p>
+<pre class="highlight plaintext"><code>let playerItem = CachingPlayerItem(url: videoURL)
+playerItem.download()
+</code></pre>
+
+<p>It&rsquo;s fine to start playing the item while it&rsquo;s being downloaded.</p>
+<h3 id='cachingplayeritemdelegate-protocol' class='heading'>CachingPlayerItemDelegate protocol</h3>
+
+<p>Note: All of the methods are optional.</p>
+<pre class="highlight plaintext"><code>@objc public protocol CachingPlayerItemDelegate {
+    // MARK: Downloading delegate methods
+
+    /// Called when the media file is fully downloaded.
+    @objc optional func playerItem(_ playerItem: CachingPlayerItem, didFinishDownloadingFileAt filePath: String)
+
+    /// Called every time a new portion of data is received.
+    @objc optional func playerItem(_ playerItem: CachingPlayerItem, didDownloadBytesSoFar bytesDownloaded: Int, outOf bytesExpected: Int)
+
+    /// Called on downloading error.
+    @objc optional func playerItem(_ playerItem: CachingPlayerItem, downloadingFailedWith error: Error)
+
+    // MARK: Playing delegate methods
+
+    /// Called after initial prebuffering is finished, means we are ready to play.
+    @objc optional func playerItemReadyToPlay(_ playerItem: CachingPlayerItem)
+
+    /// Called when the player is unable to play the data/url.
+    @objc optional func playerItemDidFailToPlay(_ playerItem: CachingPlayerItem, withError error: Error?)
+
+    /// Called when the data being downloaded did not arrive in time to continue playback.
+    @objc optional func playerItemPlaybackStalled(_ playerItem: CachingPlayerItem)
+}
+</code></pre>
+
+<p><strong>Important</strong>: You are in charge for managing the downloaded local media files. In case you used an initializer that generates the filePath randomly, you will be able to retrieve it in <code>didFinishDownloadingFileAt</code> delegate method.</p>
+<h2 id='example' class='heading'>Example</h2>
+
+<p>To run the example project, clone the repo, and run <code>pod install</code> from the Example directory first.</p>
+<h2 id='author' class='heading'>Author</h2>
+
+<p>sukov, <a href="mailto:gorjan5@hotmail.com">gorjan5@hotmail.com</a></p>
+<h2 id='license' class='heading'>License</h2>
+
+<p>CachingPlayerItem is available under the MIT license. See the LICENSE file for more info.</p>
+<h2 id='known-limitations' class='heading'>Known limitations</h2>
+
+<ul>
+<li>CachingPlayerItem loads its content sequentially. If you seek to yet not downloaded portion, it waits until data previous to this position is downloaded, and only then starts the playback.</li>
+<li>URL&rsquo;s must contain a file extension for the player to load properly. To get around this, a custom file extension can be specified e.g. <code>let playerItem = CachingPlayerItem(url: url, customFileExtension: &quot;mp3&quot;)</code>.</li>
+</ul>
+
+          </div>
+        </section>
+
+
+      </article>
+    </div>
+    <section class="footer">
+      <p>&copy; 2022 <a class="link" href="https://github.com/sukov/CachingPlayerItem" target="_blank" rel="external noopener">Gorjan Shukov</a>. All rights reserved. (Last updated: 2022-02-05)</p>
+      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.14.1</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
+    </section>
+  </body>
+</html>
