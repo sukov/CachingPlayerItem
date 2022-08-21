@@ -7,7 +7,7 @@ CachingPlayerItem is a subclass of AVPlayerItem that lets you stream and cache m
 [![License](https://img.shields.io/cocoapods/l/CachingPlayerItem.svg?style=flat)](https://cocoapods.org/pods/CachingPlayerItem)
 [![Language Swift](https://img.shields.io/badge/Language-Swift%205.0-orange.svg?style=flat)](https://swift.org)
 [![Platform](https://img.shields.io/cocoapods/p/CachingPlayerItem.svg?style=flat)](https://cocoapods.org/pods/CachingPlayerItem)
-[![Swift Package Manager](https://img.shields.io/badge/Swift_Package_Manager-compatible-orange?style=flat-square)](https://www.swift.org/package-manager/#:~:text=The%20Swift%20Package%20Manager%20is,in%20Swift%203.0%20and%20above)
+[![Swift Package Manager](https://img.shields.io/badge/Swift_Package_Manager-compatible-orange?style=flat)](https://www.swift.org/package-manager)
 
 ## Features
 
