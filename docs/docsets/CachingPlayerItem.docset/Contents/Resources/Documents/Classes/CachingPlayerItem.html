@@ -21,7 +21,7 @@
     <header class="header">
       <p class="header-col header-col--primary">
         <a class="header-link" href="../index.html">
-          CachingPlayerItem 1.0.4 Docs
+          CachingPlayerItem 1.0.5 Docs
         </a>
          (91% documented)
       </p>
@@ -116,7 +116,7 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Useful for keeping relevant model associated with CachingPlayerItem instance. This is a <strong>strong</strong> reference, be midful not to create a <strong>retain cycle</strong>.</p>
+                        <p>Useful for keeping relevant model associated with CachingPlayerItem instance. This is a <strong>strong</strong> reference, be mindful not to create a <strong>retain cycle</strong>.</p>
 
                       </div>
                       <div class="declaration">
@@ -173,9 +173,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/c:@M@CachingPlayerItem@objc(cs)CachingPlayerItem(im)initWithURL:"></a>
-                    <a name="//apple_ref/swift/Method/init(url:)" class="dashAnchor"></a>
-                    <a class="token" href="#/c:@M@CachingPlayerItem@objc(cs)CachingPlayerItem(im)initWithURL:">init(url:<wbr>)</a>
+                    <a name="/s:17CachingPlayerItemAAC3url17avUrlAssetOptionsAB10Foundation3URLV_SDySSypGSgtcfc"></a>
+                    <a name="//apple_ref/swift/Method/init(url:avUrlAssetOptions:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:17CachingPlayerItemAAC3url17avUrlAssetOptionsAB10Foundation3URLV_SDySSypGSgtcfc">init(url:<wbr>avUrlAssetOptions:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -190,7 +190,7 @@
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="n">convenience</span> <span class="nf">init</span><span class="p">(</span><span class="nv">url</span><span class="p">:</span> <span class="kt">URL</span><span class="p">)</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">convenience</span> <span class="nf">init</span><span class="p">(</span><span class="nv">url</span><span class="p">:</span> <span class="kt">URL</span><span class="p">,</span> <span class="nv">avUrlAssetOptions</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span> <span class="p">:</span> <span class="kt">Any</span><span class="p">]?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">)</span></code></pre>
 
                         </div>
                       </div>
@@ -210,6 +210,19 @@
                                 </div>
                               </td>
                             </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>avUrlAssetOptions</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>A dictionary that contains options used to customize the initialization of the asset. For supported keys and values,
+see <a href="https://developer.apple.com/documentation/avfoundation/avurlasset/initialization_options">Initialization Options.</a></p>
+                                </div>
+                              </td>
+                            </tr>
                           </tbody>
                         </table>
                       </div>
@@ -219,9 +232,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:17CachingPlayerItemAAC3url19customFileExtensionAB10Foundation3URLV_SStcfc"></a>
-                    <a name="//apple_ref/swift/Method/init(url:customFileExtension:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17CachingPlayerItemAAC3url19customFileExtensionAB10Foundation3URLV_SStcfc">init(url:<wbr>customFileExtension:<wbr>)</a>
+                    <a name="/s:17CachingPlayerItemAAC3url19customFileExtension17avUrlAssetOptionsAB10Foundation3URLV_SSSDySSypGSgtcfc"></a>
+                    <a name="//apple_ref/swift/Method/init(url:customFileExtension:avUrlAssetOptions:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:17CachingPlayerItemAAC3url19customFileExtension17avUrlAssetOptionsAB10Foundation3URLV_SSSDySSypGSgtcfc">init(url:<wbr>customFileExtension:<wbr>avUrlAssetOptions:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -236,7 +249,7 @@
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="n">convenience</span> <span class="nf">init</span><span class="p">(</span><span class="nv">url</span><span class="p">:</span> <span class="kt">URL</span><span class="p">,</span> <span class="nv">customFileExtension</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">convenience</span> <span class="nf">init</span><span class="p">(</span><span class="nv">url</span><span class="p">:</span> <span class="kt">URL</span><span class="p">,</span> <span class="nv">customFileExtension</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">avUrlAssetOptions</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span> <span class="p">:</span> <span class="kt">Any</span><span class="p">]?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">)</span></code></pre>
 
                         </div>
                       </div>
@@ -268,6 +281,19 @@
                                 </div>
                               </td>
                             </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>avUrlAssetOptions</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>A dictionary that contains options used to customize the initialization of the asset. For supported keys and values,
+see <a href="https://developer.apple.com/documentation/avfoundation/avurlasset/initialization_options">Initialization Options.</a></p>
+                                </div>
+                              </td>
+                            </tr>
                           </tbody>
                         </table>
                       </div>
@@ -277,9 +303,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:17CachingPlayerItemAAC3url12saveFilePath06customF9ExtensionAB10Foundation3URLV_S2SSgtcfc"></a>
-                    <a name="//apple_ref/swift/Method/init(url:saveFilePath:customFileExtension:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17CachingPlayerItemAAC3url12saveFilePath06customF9ExtensionAB10Foundation3URLV_S2SSgtcfc">init(url:<wbr>saveFilePath:<wbr>customFileExtension:<wbr>)</a>
+                    <a name="/s:17CachingPlayerItemAAC3url12saveFilePath06customF9Extension17avUrlAssetOptionsAB10Foundation3URLV_S2SSgSDySSypGSgtcfc"></a>
+                    <a name="//apple_ref/swift/Method/init(url:saveFilePath:customFileExtension:avUrlAssetOptions:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:17CachingPlayerItemAAC3url12saveFilePath06customF9Extension17avUrlAssetOptionsAB10Foundation3URLV_S2SSgSDySSypGSgtcfc">init(url:<wbr>saveFilePath:<wbr>customFileExtension:<wbr>avUrlAssetOptions:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -294,7 +320,7 @@
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="nf">init</span><span class="p">(</span><span class="nv">url</span><span class="p">:</span> <span class="kt">URL</span><span class="p">,</span> <span class="nv">saveFilePath</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">customFileExtension</span><span class="p">:</span> <span class="kt">String</span><span class="p">?)</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="nf">init</span><span class="p">(</span><span class="nv">url</span><span class="p">:</span> <span class="kt">URL</span><span class="p">,</span> <span class="nv">saveFilePath</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">customFileExtension</span><span class="p">:</span> <span class="kt">String</span><span class="p">?,</span> <span class="nv">avUrlAssetOptions</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span> <span class="p">:</span> <span class="kt">Any</span><span class="p">]?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">)</span></code></pre>
 
                         </div>
                       </div>
@@ -338,6 +364,19 @@
                                 </div>
                               </td>
                             </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>avUrlAssetOptions</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>A dictionary that contains options used to customize the initialization of the asset. For supported keys and values,
+see <a href="https://developer.apple.com/documentation/avfoundation/avurlasset/initialization_options">Initialization Options.</a></p>
+                                </div>
+                              </td>
+                            </tr>
                           </tbody>
                         </table>
                       </div>
@@ -347,9 +386,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:17CachingPlayerItemAAC03nonA3URLAB10Foundation0E0V_tcfc"></a>
-                    <a name="//apple_ref/swift/Method/init(nonCachingURL:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17CachingPlayerItemAAC03nonA3URLAB10Foundation0E0V_tcfc">init(nonCachingURL:<wbr>)</a>
+                    <a name="/s:17CachingPlayerItemAAC03nonA3URL17avUrlAssetOptionsAB10Foundation0E0V_SDySSypGSgtcfc"></a>
+                    <a name="//apple_ref/swift/Method/init(nonCachingURL:avUrlAssetOptions:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:17CachingPlayerItemAAC03nonA3URL17avUrlAssetOptionsAB10Foundation0E0V_SDySSypGSgtcfc">init(nonCachingURL:<wbr>avUrlAssetOptions:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -364,7 +403,7 @@
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="nf">init</span><span class="p">(</span><span class="n">nonCachingURL</span> <span class="nv">url</span><span class="p">:</span> <span class="kt">URL</span><span class="p">)</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="nf">init</span><span class="p">(</span><span class="n">nonCachingURL</span> <span class="nv">url</span><span class="p">:</span> <span class="kt">URL</span><span class="p">,</span> <span class="nv">avUrlAssetOptions</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span> <span class="p">:</span> <span class="kt">Any</span><span class="p">]?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">)</span></code></pre>
 
                         </div>
                       </div>
@@ -381,6 +420,19 @@
                               <td>
                                 <div>
                                   <p>URL referencing the media file.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>avUrlAssetOptions</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>A dictionary that contains options used to customize the initialization of the asset. For supported keys and values,
+see <a href="https://developer.apple.com/documentation/avfoundation/avurlasset/initialization_options">Initialization Options.</a></p>
                                 </div>
                               </td>
                             </tr>
@@ -415,7 +467,7 @@
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="n">convenience</span> <span class="nf">init</span><span class="p">(</span><span class="nv">data</span><span class="p">:</span> <span class="kt">Data</span><span class="p">,</span> <span class="nv">customFileExtension</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="k">throws</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">convenience</span> <span class="nf">init</span><span class="p">(</span><span class="nv">data</span><span class="p">:</span> <span class="kt">Data</span><span class="p">,</span> <span class="nv">customFileExtension</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="k">throws</span></code></pre>
 
                         </div>
                       </div>
@@ -629,8 +681,8 @@
       </article>
     </div>
     <section class="footer">
-      <p>&copy; 2022 <a class="link" href="https://github.com/sukov/CachingPlayerItem" target="_blank" rel="external noopener">Gorjan Shukov</a>. All rights reserved. (Last updated: 2022-02-05)</p>
-      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.14.1</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
+      <p>&copy; 2022 <a class="link" href="https://github.com/sukov/CachingPlayerItem" target="_blank" rel="external noopener">Gorjan Shukov</a>. All rights reserved. (Last updated: 2022-10-26)</p>
+      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.14.3</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
     </section>
   </body>
 </html>
