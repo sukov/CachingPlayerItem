@@ -105,8 +105,10 @@ final class ResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URL
 
         let configuration = URLSessionConfiguration.default
         configuration.requestCachePolicy = .reloadIgnoringLocalAndRemoteCacheData
+        var urlRequest = URLRequest(url: url)
+        owner?.urlRequestHeaders?.forEach { urlRequest.setValue($0.value, forHTTPHeaderField: $0.key) }
         session = URLSession(configuration: configuration, delegate: self, delegateQueue: nil)
-        session?.dataTask(with: url).resume()
+        session?.dataTask(with: urlRequest).resume()
     }
 
     func invalidateAndCancelSession() {

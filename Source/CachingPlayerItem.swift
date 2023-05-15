@@ -42,6 +42,8 @@ public final class CachingPlayerItem: AVPlayerItem {
     private let initialScheme: String?
     private let saveFilePath: String
     private var customFileExtension: String?
+    /// HTTPHeaderFields set in avUrlAssetOptions using AVURLAssetHTTPHeaderFieldsKey
+    internal var urlRequestHeaders: [String: String]?
 
     /// Useful for keeping relevant model associated with CachingPlayerItem instance. This is a **strong** reference, be mindful not to create a **retain cycle**.
     public var passOnObject: Any?
@@ -108,6 +110,10 @@ public final class CachingPlayerItem: AVPlayerItem {
             self.customFileExtension = ext
         }  else {
             assert(url.pathExtension.isEmpty == false, "CachingPlayerItem error: url pathExtension empty, pass the extension in `customFileExtension` parameter")
+        }
+
+        if let headers = avUrlAssetOptions?["AVURLAssetHTTPHeaderFieldsKey"] as? [String: String] {
+            self.urlRequestHeaders = headers
         }
 
         let asset = AVURLAsset(url: urlWithCustomScheme, options: avUrlAssetOptions)
