@@ -49,6 +49,10 @@ public final class CachingPlayerItem: AVPlayerItem {
 
     // MARK: Public init
 
+    public convenience init(url: URL) {
+        self.init(url: url, saveFilePath: Self.randomFilePath(withExtension: url.pathExtension), customFileExtension: nil, avUrlAssetOptions: nil)
+    }
+
     /**
      Play and cache remote media on a local file. `saveFilePath` is **radomly** generated. Requires `url.pathExtension` to not be empty otherwise the player will fail playing.
 
