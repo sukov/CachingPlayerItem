@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'CachingPlayerItem'
-  s.version          = '1.0.7'
+  s.version          = '1.0.8'
   s.summary          = 'Cache & Play audio and video files'
 
   s.homepage         = 'https://github.com/sukov/CachingPlayerItem'
