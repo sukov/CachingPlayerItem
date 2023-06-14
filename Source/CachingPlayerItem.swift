@@ -190,9 +190,13 @@ public final class CachingPlayerItem: AVPlayerItem {
         addObservers()
     }
 
-    /// Not implemented
     override public init(asset: AVAsset, automaticallyLoadedAssetKeys: [String]?) {
-        fatalError("CachingPlayerItem error: init(asset:automaticallyLoadedAssetKeys:) not implemented")
+        self.url = URL(fileURLWithPath: "")
+        self.initialScheme = nil
+        self.saveFilePath = ""
+        super.init(asset: asset, automaticallyLoadedAssetKeys: automaticallyLoadedAssetKeys)
+
+        addObservers()
     }
 
     deinit {
