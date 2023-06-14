@@ -180,7 +180,6 @@ public final class CachingPlayerItem: AVPlayerItem {
         addObservers()
     }
 
-    /// Not implemented
     override public init(asset: AVAsset, automaticallyLoadedAssetKeys: [String]?) {
         self.url = URL(fileURLWithPath: "")
         self.initialScheme = nil
