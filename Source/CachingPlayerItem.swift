@@ -172,9 +172,9 @@ public final class CachingPlayerItem: AVPlayerItem {
             self.url = url.appendingPathExtension(fileExtension)
 
             // Removes old SymLinks which cause issues
-            try? FileManager.default.removeItem(at: url)
+            try? FileManager.default.removeItem(at: self.url)
 
-            try? FileManager.default.createSymbolicLink(at: url, withDestinationURL: filePathURL)
+            try? FileManager.default.createSymbolicLink(at: self.url, withDestinationURL: filePathURL)
         } else {
             assert(filePathURL.pathExtension.isEmpty == false,
                    "CachingPlayerItem error: filePathURL pathExtension empty, pass the extension in `fileExtension` parameter")
