@@ -56,7 +56,7 @@ public final class CachingPlayerItem: AVPlayerItem {
     }
 
     /**
-     Play and cache remote media on a local file. `saveFilePath` is **radomly** generated. Requires `url.pathExtension` to not be empty otherwise the player will fail playing.
+     Play and cache remote media on a local file. `saveFilePath` is **randomly** generated. Requires `url.pathExtension` to not be empty otherwise the player will fail playing.
 
      - parameter url: URL referencing the media file.
 
@@ -68,7 +68,7 @@ public final class CachingPlayerItem: AVPlayerItem {
     }
 
     /**
-     Play and cache remote media on a local file. `saveFilePath` is **radomly** generated.
+     Play and cache remote media on a local file. `saveFilePath` is **randomly** generated.
 
      - parameter url: URL referencing the media file.
 
@@ -202,11 +202,11 @@ public final class CachingPlayerItem: AVPlayerItem {
     deinit {
         removeObservers()
 
-        // Don't reference lazy `resourceLoaderDelegate` if it hasn't been called before.
+        // Cancel download only for caching inits
         guard initialScheme != nil else { return }
 
         // Otherwise the ResourceLoaderDelegate wont deallocate and will keep downloading.
-        resourceLoaderDelegate.invalidateAndCancelSession()
+        cancelDownload()
     }
 
     // MARK: Public methods
@@ -215,11 +215,22 @@ public final class CachingPlayerItem: AVPlayerItem {
     public func download() {
         // Make sure we are not initilalized with a filePath or non-caching init.
         guard initialScheme != nil else {
-            assertionFailure("CachingPlayerItem error: Download method used on a non caching instance")
+            assertionFailure("CachingPlayerItem error: `download` method used on a non caching instance")
             return
         }
 
         resourceLoaderDelegate.startDataRequest(with: url)
+    }
+
+    /// Cancels the download of the media file and deletes the incomplete cached file. Works only with the initializers intended for play and cache.
+    public func cancelDownload() {
+        // Make sure we are not initilalized with a filePath or non-caching init.
+        guard initialScheme != nil else {
+            assertionFailure("CachingPlayerItem error: `cancelDownload` method used on a non caching instance")
+            return
+        }
+
+        resourceLoaderDelegate.invalidateAndCancelSession()
     }
 
     // MARK: KVO
