@@ -21,7 +21,12 @@ final class ResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URL
 
     private var session: URLSession?
     private var response: URLResponse?
-    private var pendingRequests = Set<AVAssetResourceLoadingRequest>()
+    private let queue = DispatchQueue(label: "com.gcd.CachingPlayerItemQueue", qos: .userInitiated, attributes: .concurrent)
+    private var pendingRequests: Set<AVAssetResourceLoadingRequest> {
+        get { queue.sync { return pendingRequestsValue } }
+        set { queue.async(flags: .barrier) { [weak self] in self?.pendingRequestsValue = newValue } }
+    }
+    private var pendingRequestsValue = Set<AVAssetResourceLoadingRequest>()
     private var isDownloadComplete = false
 
     private let url: URL
