@@ -2,14 +2,28 @@
   "warnings": [
     {
       "file": "/Users/shukov/Projects/CachingPlayerItem/Source/CachingPlayerItem.swift",
-      "line": 48,
+      "line": 50,
       "symbol": "CachingPlayerItem.delegate",
       "symbol_kind": "source.lang.swift.decl.var.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/shukov/Projects/CachingPlayerItem/Source/CachingPlayerItem.swift",
-      "line": 215,
+      "line": 54,
+      "symbol": "CachingPlayerItem.init(url:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/shukov/Projects/CachingPlayerItem/Source/CachingPlayerItem.swift",
+      "line": 193,
+      "symbol": "CachingPlayerItem.init(asset:automaticallyLoadedAssetKeys:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/shukov/Projects/CachingPlayerItem/Source/CachingPlayerItem.swift",
+      "line": 240,
       "symbol": "CachingPlayerItem.observeValue(forKeyPath:of:change:context:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
