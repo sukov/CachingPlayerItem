@@ -120,7 +120,7 @@ final class ResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URL
         session?.invalidateAndCancel()
         session = nil
         bufferData = Data()
-        pendingRequests.removeAll()
+        pendingRequestsValue.removeAll()
 
         // We need to only remove the file if it hasn't been fully downloaded
         guard isDownloadComplete == false else { return }
