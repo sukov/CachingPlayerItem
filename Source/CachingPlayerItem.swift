@@ -51,6 +51,11 @@ public final class CachingPlayerItem: AVPlayerItem {
 
     // MARK: Public init
 
+    /**
+     Play and cache remote media on a local file. `saveFilePath` is **randomly** generated. Requires `url.pathExtension` to not be empty otherwise the player will fail playing.
+
+     - parameter url: URL referencing the media file.
+     */
     public convenience init(url: URL) {
         self.init(url: url, saveFilePath: Self.randomFilePath(withExtension: url.pathExtension), customFileExtension: nil, avUrlAssetOptions: nil)
     }
@@ -190,6 +195,12 @@ public final class CachingPlayerItem: AVPlayerItem {
         addObservers()
     }
 
+    /**
+     Play media using an AVAsset. Caching is **not** supported for this method.
+
+     - parameter asset: An instance of AVAsset.
+     - parameter automaticallyLoadedAssetKeys: An NSArray of NSStrings, each representing a property key defined by AVAsset.
+     */
     override public init(asset: AVAsset, automaticallyLoadedAssetKeys: [String]?) {
         self.url = URL(fileURLWithPath: "")
         self.initialScheme = nil
