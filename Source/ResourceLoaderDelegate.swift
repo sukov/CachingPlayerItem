@@ -45,7 +45,7 @@ final class ResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URL
     }
 
     deinit {
-        invalidateAndCancelSession()
+        invalidateAndCancelSession(shouldResetData: false)
     }
 
     // MARK: AVAssetResourceLoaderDelegate
@@ -116,11 +116,14 @@ final class ResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URL
         session?.dataTask(with: urlRequest).resume()
     }
 
-    func invalidateAndCancelSession() {
+    func invalidateAndCancelSession(shouldResetData: Bool = true) {
         session?.invalidateAndCancel()
         session = nil
-        bufferData = Data()
-        pendingRequestsValue.removeAll()
+
+        if shouldResetData {
+            bufferData = Data()
+            pendingRequests.removeAll()
+        }
 
         // We need to only remove the file if it hasn't been fully downloaded
         guard isDownloadComplete == false else { return }
@@ -222,6 +225,6 @@ final class ResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URL
     }
 
     @objc private func handleAppWillTerminate() {
-        invalidateAndCancelSession()
+        invalidateAndCancelSession(shouldResetData: false)
     }
 }
