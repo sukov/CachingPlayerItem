@@ -230,7 +230,7 @@ public final class CachingPlayerItem: AVPlayerItem {
             return
         }
 
-        resourceLoaderDelegate.startDataRequest(with: url)
+        resourceLoaderDelegate.startFileDownload(with: url)
     }
 
     /// Cancels the download of the media file and deletes the incomplete cached file. Works only with the initializers intended for play and cache.

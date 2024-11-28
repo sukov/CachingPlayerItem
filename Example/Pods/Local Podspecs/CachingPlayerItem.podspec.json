@@ -1,6 +1,6 @@
 {
   "name": "CachingPlayerItem",
-  "version": "1.0.4",
+  "version": "2.0.0",
   "summary": "Cache & Play audio and video files",
   "homepage": "https://github.com/sukov/CachingPlayerItem",
   "license": {
@@ -12,7 +12,7 @@
   },
   "source": {
     "git": "https://github.com/sukov/CachingPlayerItem.git",
-    "tag": "1.0.4"
+    "tag": "2.0.0"
   },
   "swift_versions": "5.0",
   "platforms": {
