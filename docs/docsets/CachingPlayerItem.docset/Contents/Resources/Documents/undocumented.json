@@ -9,21 +9,7 @@
     },
     {
       "file": "/Users/shukov/Projects/CachingPlayerItem/Source/CachingPlayerItem.swift",
-      "line": 54,
-      "symbol": "CachingPlayerItem.init(url:)",
-      "symbol_kind": "source.lang.swift.decl.function.method.instance",
-      "warning": "undocumented"
-    },
-    {
-      "file": "/Users/shukov/Projects/CachingPlayerItem/Source/CachingPlayerItem.swift",
-      "line": 193,
-      "symbol": "CachingPlayerItem.init(asset:automaticallyLoadedAssetKeys:)",
-      "symbol_kind": "source.lang.swift.decl.function.method.instance",
-      "warning": "undocumented"
-    },
-    {
-      "file": "/Users/shukov/Projects/CachingPlayerItem/Source/CachingPlayerItem.swift",
-      "line": 240,
+      "line": 251,
       "symbol": "CachingPlayerItem.observeValue(forKeyPath:of:change:context:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
