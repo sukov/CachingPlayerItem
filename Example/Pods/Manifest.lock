@@ -1,5 +1,5 @@
 PODS:
-  - CachingPlayerItem (1.0.4)
+  - CachingPlayerItem (2.0.0)
   - Nimble (9.2.1)
   - Quick (4.0.0)
 
@@ -18,10 +18,10 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  CachingPlayerItem: 7f6792912f2b186fededb6dd3d62250f76c088a5
+  CachingPlayerItem: 61dfcd2931cf590d8f461d4cbee65cd2e643f69b
   Nimble: e7e615c0335ee4bf5b0d786685451e62746117d5
   Quick: 6473349e43b9271a8d43839d9ba1c442ed1b7ac4
 
 PODFILE CHECKSUM: 0b648f8072442c1ace440db05048c9726462e88a
 
-COCOAPODS: 1.10.1
+COCOAPODS: 1.15.2
