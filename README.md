@@ -139,6 +139,5 @@ CachingPlayerItem is available under the MIT license. See the LICENSE file for m
 
 ## Known limitations
 
-- CachingPlayerItem loads its content sequentially. If you seek to yet not downloaded portion, it waits until data previous to this position is downloaded, and only then starts the playback.
 - URL's must contain a file extension for the player to load properly. To get around this, a custom file extension can be specified e.g. `let playerItem = CachingPlayerItem(url: url, customFileExtension: "mp3")`.
 - HTTP live streaming (HLS) `M3U8` caching is not supported. You can only use `init(nonCachingURL:)` for playing M3U8.
