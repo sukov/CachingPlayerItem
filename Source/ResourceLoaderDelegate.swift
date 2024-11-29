@@ -113,8 +113,9 @@ final class ResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URL
             guard let self else { return }
 
             let taskId = task.taskIdentifier
+            if let error {
+                guard (error as? URLError)?.code != .cancelled else { return }
 
-            if let error = error {
                 if pendingContentInfoRequest?.id == taskId {
                     finishLoadingPendingRequest(withId: taskId, error: error)
                     downloadFailed(with: error)
