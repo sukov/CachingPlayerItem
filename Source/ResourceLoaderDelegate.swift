@@ -22,7 +22,12 @@ final class ResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URL
     private lazy var fileHandle = MediaFileHandle(filePath: saveFilePath)
 
     private var session: URLSession?
-    private let queue = DispatchQueue(label: "com.gcd.CachingPlayerItemQueue", qos: .userInitiated)
+    private let operationQueue = {
+        let queue = OperationQueue()
+        queue.name = "CachingPlayerItemOperationQueue"
+        queue.maxConcurrentOperationCount = 1
+        return queue
+    }()
     private var pendingContentInfoRequest: PendingContentInfoRequest? {
         didSet { oldValue?.cancelTask() }
     }
@@ -42,12 +47,7 @@ final class ResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URL
         self.saveFilePath = saveFilePath
         self.owner = owner
         super.init()
-
         NotificationCenter.default.addObserver(self, selector: #selector(handleAppWillTerminate), name: UIApplication.willTerminateNotification, object: nil)
-    }
-
-    deinit {
-        invalidateAndCancelSession(shouldResetData: false)
     }
 
     // MARK: AVAssetResourceLoaderDelegate
@@ -68,7 +68,7 @@ final class ResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URL
             let request = PendingDataRequest(url: url, session: session, loadingRequest: loadingRequest, customHeaders: owner?.urlRequestHeaders)
             request.delegate = self
             request.startTask()
-            pendingDataRequests[request.id] = request
+            addOperationOnQueue { [weak self] in self?.pendingDataRequests[request.id] = request }
             return true
         } else {
             return false
@@ -76,7 +76,7 @@ final class ResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URL
     }
 
     func resourceLoader(_ resourceLoader: AVAssetResourceLoader, didCancel loadingRequest: AVAssetResourceLoadingRequest) {
-        queue.async { [weak self] in
+        addOperationOnQueue { [weak self] in
             guard let self else { return }
             guard let key = pendingDataRequests.first(where: { $1.loadingRequest.request.url == loadingRequest.request.url })?.key else { return }
 
@@ -88,7 +88,7 @@ final class ResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URL
     // MARK: URLSessionDelegate
 
     func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
-        queue.async { [weak self] in
+        addOperationOnQueue { [weak self] in
             guard let self else { return }
 
             pendingDataRequests[dataTask.taskIdentifier]?.respond(withRemoteData: data)
@@ -109,7 +109,7 @@ final class ResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URL
     }
 
     func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
-        queue.async { [weak self] in
+        addOperationOnQueue { [weak self] in
             guard let self else { return }
 
             let taskId = task.taskIdentifier
@@ -169,10 +169,11 @@ final class ResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URL
     func invalidateAndCancelSession(shouldResetData: Bool = true) {
         session?.invalidateAndCancel()
         session = nil
+        operationQueue.cancelAllOperations()
 
         if shouldResetData {
             bufferData = Data()
-            queue.async { [weak self] in
+            addOperationOnQueue { [weak self] in
                 guard let self else { return }
 
                 pendingContentInfoRequest = nil
@@ -254,6 +255,16 @@ final class ResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URL
         }
     }
 
+    private func addOperationOnQueue(_ block: @escaping () -> Void) {
+        let blockOperation = BlockOperation()
+        blockOperation.addExecutionBlock({ [unowned blockOperation] in
+            guard blockOperation.isCancelled == false else { return }
+
+            block()
+        })
+        operationQueue.addOperation(blockOperation)
+    }
+
     @objc private func handleAppWillTerminate() {
         invalidateAndCancelSession(shouldResetData: false)
     }
@@ -265,12 +276,12 @@ extension ResourceLoaderDelegate: PendingDataRequestDelegate {
     func pendingDataRequest(_ request: PendingDataRequest, hasSufficientCachedDataFor offset: Int, with length: Int) -> Bool {
         fileHandle.fileSize >= length + offset
     }
-    
+
     func pendingDataRequest(_ request: PendingDataRequest,
                             requestCachedDataFor offset: Int,
                             with length: Int,
                             completion: @escaping ((_ continueRequesting: Bool) -> Void)) {
-        queue.async { [weak self] in
+        addOperationOnQueue { [weak self] in
             guard let self else { return }
 
             let bytesCached = fileHandle.fileSize
