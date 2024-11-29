@@ -98,7 +98,7 @@ final class ResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URL
             bufferData.append(data)
             writeBufferDataToFileIfNeeded()
 
-            guard let response = contentInfoResponse else { return }
+            guard let response = contentInfoResponse ?? dataTask.response else { return }
 
             DispatchQueue.main.async {
                 self.owner?.delegate?.playerItem?(self.owner!,
@@ -141,7 +141,7 @@ final class ResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URL
                 writeBufferDataToFileIfNeeded(forced: true)
             }
 
-            let error = verifyResponse()
+            let error = verify(response: contentInfoResponse ?? task.response)
 
             guard error == nil else {
                 downloadFailed(with: error!)
@@ -228,8 +228,8 @@ final class ResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URL
         }
     }
 
-    private func verifyResponse() -> NSError? {
-        guard let response = contentInfoResponse as? HTTPURLResponse else { return nil }
+    private func verify(response: URLResponse?) -> NSError? {
+        guard let response = response as? HTTPURLResponse else { return nil }
 
         let shouldVerifyDownloadedFileSize = CachingPlayerItemConfiguration.shouldVerifyDownloadedFileSize
         let minimumExpectedFileSize = CachingPlayerItemConfiguration.minimumExpectedFileSize
