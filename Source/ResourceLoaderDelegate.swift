@@ -215,8 +215,13 @@ final class ResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URL
     private func writeBufferDataToFileIfNeeded(forced: Bool = false) {
         lock.lock()
         defer { lock.unlock() }
-
-        guard bufferData.count >= downloadBufferLimit || forced else { return }
+        guard 
+            let availableSpace = try? FileManager.default.url(for: .cachesDirectory, in: .userDomainMask, appropriateFor: nil, create: false).resourceValues(forKeys: [.volumeAvailableCapacityKey]).volumeAvailableCapacity,
+            availableSpace > Int64(bufferData.count), 
+            bufferData.count >= downloadBufferLimit || force 
+        else {
+             return
+        }
 
         fileHandle.append(data: bufferData)
         bufferData = Data()
