@@ -113,6 +113,7 @@ final class ResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URL
             guard let self else { return }
 
             let taskId = task.taskIdentifier
+            
             if let error {
                 guard (error as? URLError)?.code != .cancelled else { return }
 
@@ -129,6 +130,12 @@ final class ResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URL
             }
 
             if let response = task.response, pendingContentInfoRequest?.id == taskId {
+                let insufficientDiskSpaceError = checkAvailableDiskSpaceIfNeeded(response: response)
+                guard insufficientDiskSpaceError == nil else {
+                    downloadFailed(with: insufficientDiskSpaceError!)
+                    return
+                }
+
                 pendingContentInfoRequest?.fillInContentInformationRequest(with: response)
                 finishLoadingPendingRequest(withId: taskId)
                 contentInfoResponse = response
@@ -246,6 +253,20 @@ final class ResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URL
         }
 
         return error
+    }
+
+    private func checkAvailableDiskSpaceIfNeeded(response: URLResponse) -> NSError? {
+        guard
+            CachingPlayerItemConfiguration.shouldCheckAvailableDiskSpaceBeforeCaching,
+            let response = response as? HTTPURLResponse,
+            let freeDiskSpace = fileHandle.freeDiskSpace
+        else { return nil }
+
+        if freeDiskSpace < response.processedInfoData.expectedContentLength {
+            return NSError(domain: "Failed downloading asset. Reason: insufficient disk space available.", code: NSFileWriteOutOfSpaceError, userInfo: nil)
+        }
+
+        return nil
     }
 
     private func downloadFailed(with error: Error) {
