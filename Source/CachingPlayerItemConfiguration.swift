@@ -21,6 +21,9 @@ public enum CachingPlayerItemConfiguration {
     /// If set greater than 0, the set value with be compared with the downloaded media size. If the size of the downloaded media is lower, an error will be thrown. Useful when `expectedContentLength` is unavailable.
     /// Default value is `0`.
     public static var minimumExpectedFileSize: Int = 0
+
+    /// Flag for deciding whether an `NSFileWriteOutOfSpaceError` should be thrown when there is not enough available disk space left for caching the entire media file. Defaults to `true`.
+    public static var shouldCheckAvailableDiskSpaceBeforeCaching: Bool = true
 }
 
 fileprivate extension Int {

@@ -37,6 +37,12 @@ final class MediaFileHandle {
 // MARK: Internal methods
 
 extension MediaFileHandle {
+    var freeDiskSpace: Int64? {
+        let systemAttributes = try? FileManager.default.attributesOfFileSystem(forPath: NSHomeDirectory() as String)
+        let freeSpace = (systemAttributes?[FileAttributeKey.systemFreeSize] as? NSNumber)?.int64Value
+        return freeSpace
+    }
+
     var attributes: [FileAttributeKey : Any]? {
         do {
             return try FileManager.default.attributesOfItem(atPath: filePath)

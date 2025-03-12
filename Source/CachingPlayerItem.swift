@@ -217,7 +217,7 @@ public final class CachingPlayerItem: AVPlayerItem {
         guard initialScheme != nil else { return }
 
         // Otherwise the ResourceLoaderDelegate wont deallocate and will keep downloading.
-        cancelDownload()
+        resourceLoaderDelegate.invalidateAndCancelSession(shouldResetData: false)
     }
 
     // MARK: Public methods
