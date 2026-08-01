@@ -7,6 +7,8 @@ let package = Package(
     defaultLocalization: "en",
     platforms: [
         .iOS("13.4"),
+        .macOS("10.15.4"),
+        .tvOS("13.4"),
     ],
     products: [
         .library(name: "CachingPlayerItem", targets: ["CachingPlayerItem"]),

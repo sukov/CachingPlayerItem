@@ -7,7 +7,11 @@
 
 import Foundation
 import AVFoundation
+#if canImport(UIKit)
 import UIKit
+#elseif canImport(AppKit)
+import AppKit
+#endif
 
 /// Responsible for downloading media data and providing the requested data parts.
 final class ResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URLSessionDelegate, URLSessionDataDelegate, URLSessionTaskDelegate {
@@ -82,7 +86,13 @@ final class ResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URL
         self.owner = owner
         super.init()
         
-        NotificationCenter.default.addObserver(self, selector: #selector(handleAppWillTerminate), name: UIApplication.willTerminateNotification, object: nil)
+        #if canImport(UIKit)
+        let willTerminateNotification = UIApplication.willTerminateNotification
+        #elseif canImport(AppKit)
+        let willTerminateNotification = NSApplication.willTerminateNotification
+        #endif
+
+        NotificationCenter.default.addObserver(self, selector: #selector(handleAppWillTerminate), name: willTerminateNotification, object: nil)
     }
 
     // MARK: AVAssetResourceLoaderDelegate
