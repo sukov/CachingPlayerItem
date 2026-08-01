@@ -222,7 +222,6 @@ final class ResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URL
         sessionLock.lock()
         session?.invalidateAndCancel()
         session = nil
-        isSessionInvalidated = true
         sessionLock.unlock()
 
         operationQueue.cancelAllOperations()
@@ -243,7 +242,11 @@ final class ResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URL
         // We need to only remove the file if it hasn't been fully downloaded
         guard isDownloadComplete == false else { return }
 
-        fileHandle.deleteFile()
+        if shouldResetData {
+            fileHandle.reset()
+        } else {
+            fileHandle.deleteFile()
+        }
     }
 
     // MARK: Private methods

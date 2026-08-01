@@ -88,6 +88,22 @@ extension MediaFileHandle {
         writeHandle?.closeFile()
     }
 
+    func reset() {
+        lock.lock()
+        defer { lock.unlock() }
+
+        close()
+
+        if FileManager.default.fileExists(atPath: filePath) {
+            deleteFile()
+        }
+
+        FileManager.default.createFile(atPath: filePath, contents: nil, attributes: nil)
+
+        readHandle = FileHandle(forReadingAtPath: filePath)
+        writeHandle = FileHandle(forWritingAtPath: filePath)
+    }
+
     func deleteFile() {
         do {
             try FileManager.default.removeItem(atPath: filePath)
