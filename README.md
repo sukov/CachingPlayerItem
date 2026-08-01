@@ -2,6 +2,7 @@
 
 CachingPlayerItem is a subclass of AVPlayerItem that lets you stream and cache media content on iOS, macOS, tvOS and visionOS. Initial idea for this library was found [here](https://github.com/neekeetab/CachingPlayerItem).
 
+[![CI](https://github.com/sukov/CachingPlayerItem/actions/workflows/ci.yml/badge.svg)](https://github.com/sukov/CachingPlayerItem/actions/workflows/ci.yml)
 [![Version](https://img.shields.io/cocoapods/v/CachingPlayerItem.svg?style=flat)](https://cocoapods.org/pods/CachingPlayerItem)
 [![License](https://img.shields.io/cocoapods/l/CachingPlayerItem.svg?style=flat)](https://cocoapods.org/pods/CachingPlayerItem)
 [![Language Swift](https://img.shields.io/badge/Language-Swift%205.0-orange.svg?style=flat)](https://swift.org)
