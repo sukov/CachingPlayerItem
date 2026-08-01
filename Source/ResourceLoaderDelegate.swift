@@ -280,13 +280,30 @@ final class ResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URL
     }
 
     private func writeBufferDataToFileIfNeeded(forced: Bool = false) {
+        let downloadBufferLimit = configuration.downloadBufferLimit
+
         bufferLock.lock()
-        defer { bufferLock.unlock() }
 
-        guard bufferData.count >= configuration.downloadBufferLimit || forced else { return }
+        guard bufferData.count >= downloadBufferLimit || forced else {
+            bufferLock.unlock()
+            return
+        }
 
-        fileHandle.append(data: bufferData)
-        bufferData = Data()
+        var error: Error?
+
+        do {
+            try fileHandle.append(data: bufferData)
+            bufferData = Data()
+        } catch let appendError {
+            error = appendError
+        }
+
+        bufferLock.unlock()
+
+        if let error {
+            AppLogger.error("Failed writing buffered data to \(saveFilePath) with error: \(error)")
+            downloadFailed(with: error)
+        }
     }
 
     private func downloadComplete() {
