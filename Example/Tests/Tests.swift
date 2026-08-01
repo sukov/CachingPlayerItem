@@ -1,6 +1,7 @@
 import Quick
 import Nimble
 import AVFoundation
+import Network
 @testable import CachingPlayerItem
 
 class CachingPlayerItemSpec: QuickSpec {
@@ -703,6 +704,90 @@ class CachingPlayerItemSpec: QuickSpec {
             }
         }
 
+        // MARK: - MediaFileHandle Tests
+
+        describe("MediaFileHandle") {
+            var tempDirectory: URL!
+            var filePath: String!
+
+            beforeEach {
+                tempDirectory = FileManager.default.temporaryDirectory
+                    .appendingPathComponent(UUID().uuidString, isDirectory: true)
+                try? FileManager.default.createDirectory(at: tempDirectory, withIntermediateDirectories: true)
+                filePath = tempDirectory.appendingPathComponent("media.mp4").path
+            }
+
+            afterEach {
+                try? FileManager.default.removeItem(at: tempDirectory)
+            }
+
+            // Issue #38: these used to raise NSFileHandleOperationException, uncatchable from Swift.
+            context("when the handle is closed") {
+                it("throws from append instead of raising") {
+                    let sut = MediaFileHandle(filePath: filePath)
+                    try? sut.append(data: Data([0x01, 0x02, 0x03]))
+                    sut.close()
+
+                    expect { try sut.append(data: Data([0x04, 0x05, 0x06])) }.to(throwError())
+                }
+
+                it("returns nil from read instead of raising") {
+                    let sut = MediaFileHandle(filePath: filePath)
+                    try? sut.append(data: Data([0x01, 0x02, 0x03]))
+                    sut.close()
+
+                    expect(sut.readData(withOffset: 0, forLength: 3)).to(beNil())
+                }
+
+                it("does not raise from synchronize or a second close") {
+                    let sut = MediaFileHandle(filePath: filePath)
+                    try? sut.append(data: Data([0x01]))
+                    sut.close()
+
+                    expect { sut.synchronize() }.toNot(raiseException())
+                    expect { sut.close() }.toNot(raiseException())
+                }
+            }
+
+            context("when reset") {
+                it("empties the file") {
+                    let sut = MediaFileHandle(filePath: filePath)
+                    try? sut.append(data: Data(repeating: 0xAB, count: 128))
+                    expect(sut.fileSize).to(equal(128))
+
+                    sut.reset()
+
+                    expect(sut.fileSize).to(equal(0))
+                    expect(FileManager.default.fileExists(atPath: filePath)).to(beTrue())
+                }
+
+                it("appends to the new file after the old one was deleted") {
+                    let sut = MediaFileHandle(filePath: filePath)
+                    try? sut.append(data: Data(repeating: 0xAB, count: 128))
+
+                    // A handle left open on the unlinked file would keep writing nowhere.
+                    sut.deleteFile()
+                    sut.reset()
+                    try? sut.append(data: Data(repeating: 0xCD, count: 64))
+
+                    expect(sut.fileSize).to(equal(64))
+                    expect(try? Data(contentsOf: URL(fileURLWithPath: filePath)))
+                        .to(equal(Data(repeating: 0xCD, count: 64)))
+                }
+
+                it("reads back data written after the reset") {
+                    let sut = MediaFileHandle(filePath: filePath)
+                    try? sut.append(data: Data(repeating: 0xAB, count: 32))
+                    _ = sut.readData(withOffset: 0, forLength: 32)
+
+                    sut.reset()
+                    try? sut.append(data: Data([0x01, 0x02, 0x03, 0x04]))
+
+                    expect(sut.readData(withOffset: 0, forLength: 4)).to(equal(Data([0x01, 0x02, 0x03, 0x04])))
+                }
+            }
+        }
+
         // MARK: - Resource Loader Integration Tests
 
         describe("Resource Loader Integration") {
@@ -874,5 +959,487 @@ class MockCachingPlayerItemDelegate: NSObject, CachingPlayerItemDelegate {
         lastBytesExpected = 0
         lastError = nil
         lastPlayError = nil
+    }
+}
+
+// MARK: - Concurrency Tests
+
+/// Connection is refused immediately, so tasks resolve without leaving the device.
+private let unreachableURL = URL(string: "http://127.0.0.1:1/test-video.mp4")!
+
+class CachingPlayerItemConcurrencySpec: QuickSpec {
+    override class func spec() {
+        var tempDirectory: URL!
+
+        func makeFilePath() -> String {
+            tempDirectory.appendingPathComponent("\(UUID().uuidString).mp4").path
+        }
+
+        beforeEach {
+            tempDirectory = FileManager.default.temporaryDirectory
+                .appendingPathComponent(UUID().uuidString, isDirectory: true)
+            try? FileManager.default.createDirectory(at: tempDirectory, withIntermediateDirectories: true)
+        }
+
+        afterEach {
+            try? FileManager.default.removeItem(at: tempDirectory)
+        }
+
+        describe("MediaFileHandle under contention") {
+            it("serializes concurrent appends without losing bytes") {
+                let sut = MediaFileHandle(filePath: makeFilePath())
+                let chunk = Data(repeating: 0xEE, count: 512)
+                let writers = 8
+                let appendsPerWriter = 50
+                let group = DispatchGroup()
+
+                for _ in 0..<writers {
+                    DispatchQueue.global().async(group: group) {
+                        for _ in 0..<appendsPerWriter { try? sut.append(data: chunk) }
+                    }
+                }
+                group.wait()
+
+                expect(sut.fileSize).to(equal(writers * appendsPerWriter * chunk.count))
+            }
+
+            it("stays usable when reset races with appends and reads") {
+                let sut = MediaFileHandle(filePath: makeFilePath())
+                let chunk = Data(repeating: 0xAB, count: 256)
+                let group = DispatchGroup()
+
+                for _ in 0..<4 {
+                    DispatchQueue.global().async(group: group) {
+                        for _ in 0..<100 { try? sut.append(data: chunk) }
+                    }
+                }
+                for _ in 0..<2 {
+                    DispatchQueue.global().async(group: group) {
+                        for _ in 0..<100 { _ = sut.readData(withOffset: 0, forLength: 128) }
+                    }
+                }
+                DispatchQueue.global().async(group: group) {
+                    for _ in 0..<50 { sut.reset() }
+                }
+                group.wait()
+
+                sut.reset()
+                try? sut.append(data: Data([0x01, 0x02, 0x03]))
+
+                expect(sut.fileSize).to(equal(3))
+                expect(sut.readData(withOffset: 0, forLength: 3)).to(equal(Data([0x01, 0x02, 0x03])))
+            }
+        }
+
+        describe("session lifecycle under contention") {
+            // Issue #31 raised an ObjC exception here, so completing every round is the assertion.
+            it("never creates a task on an invalidated session") {
+                let rounds = 40
+                let iterations = 120
+                var completedRounds = 0
+
+                for _ in 0..<rounds {
+                    let sut = ResourceLoaderDelegate(url: unreachableURL,
+                                                     saveFilePath: makeFilePath(),
+                                                     owner: nil)
+                    let group = DispatchGroup()
+
+                    DispatchQueue.global().async(group: group) {
+                        for _ in 0..<iterations { sut.startFileDownload(with: unreachableURL) }
+                    }
+                    DispatchQueue.global().async(group: group) {
+                        for _ in 0..<iterations { sut.invalidateAndCancelSession() }
+                    }
+                    if group.wait(timeout: .now() + 30) == .timedOut {
+                        fail("round \(completedRounds) did not finish in 30s - probable deadlock")
+                        break
+                    }
+
+                    completedRounds += 1
+                }
+
+                expect(completedRounds).to(equal(rounds))
+            }
+
+            it("survives interleaved cancels, restarts and received data") {
+                let rounds = 20
+                let iterations = 80
+                var completedRounds = 0
+
+                for _ in 0..<rounds {
+                    let sut = ResourceLoaderDelegate(url: unreachableURL,
+                                                     saveFilePath: makeFilePath(),
+                                                     owner: nil)
+                    let probeSession = URLSession(configuration: .default)
+                    let probeTask = probeSession.dataTask(with: unreachableURL)
+                    let group = DispatchGroup()
+
+                    DispatchQueue.global().async(group: group) {
+                        for _ in 0..<iterations { sut.startFileDownload(with: unreachableURL) }
+                    }
+                    DispatchQueue.global().async(group: group) {
+                        for _ in 0..<iterations { sut.invalidateAndCancelSession() }
+                    }
+                    DispatchQueue.global().async(group: group) {
+                        for _ in 0..<iterations {
+                            sut.urlSession(probeSession,
+                                           dataTask: probeTask,
+                                           didReceive: Data(repeating: 0x11, count: 256))
+                        }
+                    }
+                    if group.wait(timeout: .now() + 30) == .timedOut {
+                        fail("round \(completedRounds) did not finish in 30s - probable deadlock")
+                        probeSession.invalidateAndCancel()
+                        break
+                    }
+                    probeSession.invalidateAndCancel()
+
+                    completedRounds += 1
+                }
+
+                expect(completedRounds).to(equal(rounds))
+            }
+
+            it("leaves a writable file behind after a cancel so a restart can use it") {
+                let filePath = makeFilePath()
+                let sut = ResourceLoaderDelegate(url: unreachableURL, saveFilePath: filePath, owner: nil)
+
+                sut.startFileDownload(with: unreachableURL)
+                sut.invalidateAndCancelSession()
+
+                // Replaced rather than left deleted, which is what makes a restart able to write.
+                expect(FileManager.default.fileExists(atPath: filePath)).to(beTrue())
+                expect(sut.isDownloadComplete).to(beFalse())
+
+                sut.startFileDownload(with: unreachableURL)
+                sut.invalidateAndCancelSession(shouldResetData: false)
+
+                // The teardown path deletes instead, so no empty file is left in the cache directory.
+                expect(FileManager.default.fileExists(atPath: filePath)).to(beFalse())
+            }
+        }
+    }
+}
+
+// MARK: - Playback Stress Test Infrastructure
+
+/// Generates a real, seekable mp4 so AVFoundation issues genuine content-info and data requests.
+enum TestMedia {
+    static func makeMP4(at url: URL, durationSeconds: Int = 4, fps: Int32 = 12) -> Data? {
+        try? FileManager.default.removeItem(at: url)
+
+        guard let writer = try? AVAssetWriter(outputURL: url, fileType: .mp4) else { return nil }
+
+        let width = 320
+        let height = 240
+        let input = AVAssetWriterInput(mediaType: .video, outputSettings: [
+            AVVideoCodecKey: AVVideoCodecType.h264,
+            AVVideoWidthKey: width,
+            AVVideoHeightKey: height,
+        ])
+        input.expectsMediaDataInRealTime = false
+
+        let adaptor = AVAssetWriterInputPixelBufferAdaptor(assetWriterInput: input, sourcePixelBufferAttributes: [
+            kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA,
+            kCVPixelBufferWidthKey as String: width,
+            kCVPixelBufferHeightKey as String: height,
+        ])
+
+        guard writer.canAdd(input) else { return nil }
+        writer.add(input)
+        guard writer.startWriting() else { return nil }
+        writer.startSession(atSourceTime: .zero)
+
+        for frame in 0..<(Int(fps) * durationSeconds) {
+            while input.isReadyForMoreMediaData == false { usleep(2_000) }
+
+            guard let buffer = makePixelBuffer(width: width, height: height, seed: frame) else { continue }
+            adaptor.append(buffer, withPresentationTime: CMTime(value: Int64(frame), timescale: fps))
+        }
+        input.markAsFinished()
+
+        let finished = DispatchSemaphore(value: 0)
+        writer.finishWriting { finished.signal() }
+        guard finished.wait(timeout: .now() + 30) == .success, writer.status == .completed else { return nil }
+
+        return try? Data(contentsOf: url)
+    }
+
+    private static func makePixelBuffer(width: Int, height: Int, seed: Int) -> CVPixelBuffer? {
+        var pixelBuffer: CVPixelBuffer?
+        guard CVPixelBufferCreate(kCFAllocatorDefault, width, height,
+                                  kCVPixelFormatType_32BGRA, nil, &pixelBuffer) == kCVReturnSuccess,
+              let buffer = pixelBuffer
+        else { return nil }
+
+        CVPixelBufferLockBaseAddress(buffer, [])
+        if let base = CVPixelBufferGetBaseAddress(buffer) {
+            memset(base, Int32(32 + (seed * 9) % 200), CVPixelBufferGetBytesPerRow(buffer) * height)
+        }
+        CVPixelBufferUnlockBaseAddress(buffer, [])
+
+        return buffer
+    }
+}
+
+/// Loopback HTTP server with the `Range` support the library needs for byte-range access.
+final class LocalMediaServer {
+    private let media: Data
+    private let listener: NWListener
+    private let queue = DispatchQueue(label: "LocalMediaServer", attributes: .concurrent)
+
+    var port: UInt16 { listener.port?.rawValue ?? 0 }
+
+    init(media: Data) throws {
+        self.media = media
+
+        let parameters = NWParameters.tcp
+        parameters.allowLocalEndpointReuse = true
+        listener = try NWListener(using: parameters)
+    }
+
+    func start() -> Bool {
+        let ready = DispatchSemaphore(value: 0)
+
+        listener.stateUpdateHandler = { state in
+            switch state {
+            case .ready, .failed, .cancelled: ready.signal()
+            default: break
+            }
+        }
+        listener.newConnectionHandler = { [weak self] connection in
+            guard let self else { return connection.cancel() }
+
+            connection.start(queue: queue)
+            receive(on: connection, buffer: Data())
+        }
+        listener.start(queue: queue)
+
+        return ready.wait(timeout: .now() + 10) == .success && port > 0
+    }
+
+    func stop() {
+        listener.stateUpdateHandler = nil
+        listener.newConnectionHandler = nil
+        listener.cancel()
+    }
+
+    private func receive(on connection: NWConnection, buffer: Data) {
+        connection.receive(minimumIncompleteLength: 1, maximumLength: 16_384) { [weak self] data, _, isComplete, error in
+            guard let self else { return connection.cancel() }
+
+            var buffer = buffer
+            if let data { buffer.append(data) }
+
+            guard let headerEnd = buffer.range(of: Data("\r\n\r\n".utf8)) else {
+                guard error == nil, isComplete == false else { return connection.cancel() }
+
+                receive(on: connection, buffer: buffer)
+                return
+            }
+
+            respond(to: String(decoding: buffer[..<headerEnd.lowerBound], as: UTF8.self), on: connection)
+        }
+    }
+
+    private func respond(to header: String, on connection: NWConnection) {
+        let total = media.count
+        var lower = 0
+        var upper = total - 1
+        var isPartial = false
+
+        if let rangeLine = header.split(separator: "\r\n").first(where: { $0.lowercased().hasPrefix("range:") }),
+           let spec = rangeLine.split(separator: "=").last {
+            let bounds = spec.split(separator: "-", omittingEmptySubsequences: false).map(String.init)
+
+            if let start = Int(bounds.first ?? "") {
+                lower = start
+                isPartial = true
+
+                if bounds.count > 1, let end = Int(bounds[1]) { upper = min(end, total - 1) }
+            }
+        }
+
+        var response: Data
+
+        if lower > upper || lower >= total {
+            response = Data("HTTP/1.1 416 Requested Range Not Satisfiable\r\nContent-Length: 0\r\nConnection: close\r\n\r\n".utf8)
+        } else {
+            let body = media.subdata(in: lower..<(upper + 1))
+            var head = isPartial ? "HTTP/1.1 206 Partial Content\r\n" : "HTTP/1.1 200 OK\r\n"
+            head += "Content-Type: video/mp4\r\n"
+            head += "Accept-Ranges: bytes\r\n"
+            head += "Content-Length: \(body.count)\r\n"
+            if isPartial { head += "Content-Range: bytes \(lower)-\(upper)/\(total)\r\n" }
+            head += "Connection: close\r\n\r\n"
+
+            response = Data(head.utf8)
+            response.append(body)
+        }
+
+        connection.send(content: response, completion: .contentProcessed { _ in connection.cancel() })
+    }
+}
+
+// MARK: - Playback Stress Tests
+
+class CachingPlayerItemPlaybackStressSpec: QuickSpec {
+    override class func spec() {
+        describe("resource loader during playback") {
+            var tempDirectory: URL!
+            var server: LocalMediaServer!
+            var mediaData: Data!
+            var mediaURL: URL!
+
+            beforeEach {
+                tempDirectory = FileManager.default.temporaryDirectory
+                    .appendingPathComponent(UUID().uuidString, isDirectory: true)
+                try? FileManager.default.createDirectory(at: tempDirectory, withIntermediateDirectories: true)
+
+                mediaData = TestMedia.makeMP4(at: tempDirectory.appendingPathComponent("source.mp4"))
+                server = try? LocalMediaServer(media: mediaData ?? Data())
+                _ = server?.start()
+                mediaURL = URL(string: "http://127.0.0.1:\(server?.port ?? 0)/video.mp4")
+            }
+
+            afterEach {
+                server?.stop()
+                server = nil
+                try? FileManager.default.removeItem(at: tempDirectory)
+            }
+
+            // Guards the suite below: if the fixture breaks, the stress tests would pass vacuously.
+            it("serves real seekable media over loopback") {
+                expect(mediaData?.count ?? 0).to(beGreaterThan(2_000))
+                expect(server.port).to(beGreaterThan(0))
+
+                let delegate = MockCachingPlayerItemDelegate()
+                let item = CachingPlayerItem(url: mediaURL)
+                item.delegate = delegate
+                let player = AVPlayer(playerItem: item)
+                player.play()
+
+                // The resource loader is called on the main queue, so the run loop has to be pumped.
+                let deadline = Date().addingTimeInterval(6)
+                while Date() < deadline && delegate.didDownloadBytesCalled == false {
+                    RunLoop.current.run(mode: .default, before: Date().addingTimeInterval(0.05))
+                }
+
+                player.pause()
+                player.replaceCurrentItem(with: nil)
+
+                expect(delegate.didDownloadBytesCalled).to(beTrue())
+                expect(delegate.lastBytesExpected).to(equal(mediaData.count))
+            }
+
+            // The frame that crashed in issue #31, driven through a real player.
+            it("survives cancelDownload and download racing seeks during playback") {
+                let rounds = 5
+                var completedRounds = 0
+                var sawLoaderActivity = false
+
+                for round in 0..<rounds {
+                    let delegate = MockCachingPlayerItemDelegate()
+                    let item = CachingPlayerItem(
+                        url: mediaURL,
+                        saveFilePath: tempDirectory.appendingPathComponent("cache-\(round).mp4").path,
+                        customFileExtension: nil
+                    )
+                    item.delegate = delegate
+
+                    let player = AVPlayer(playerItem: item)
+                    player.play()
+
+                    let deadline = Date().addingTimeInterval(1.5)
+                    let churn = DispatchGroup()
+
+                    DispatchQueue.global().async(group: churn) {
+                        while Date() < deadline {
+                            item.cancelDownload()
+                            item.download()
+                            usleep(500)
+                        }
+                    }
+
+                    var nextSeek = Date()
+                    while Date() < deadline {
+                        RunLoop.current.run(mode: .default, before: Date().addingTimeInterval(0.02))
+
+                        if Date() >= nextSeek {
+                            player.seek(to: CMTime(seconds: Double.random(in: 0...3), preferredTimescale: 600))
+                            nextSeek = Date().addingTimeInterval(0.05)
+                        }
+                    }
+                    if churn.wait(timeout: .now() + 30) == .timedOut {
+                        fail("round \(round) churn did not finish in 30s - probable deadlock")
+                        break
+                    }
+
+                    player.pause()
+                    player.replaceCurrentItem(with: nil)
+
+                    if delegate.didDownloadBytesCalled || delegate.downloadingFailedCalled
+                        || delegate.didFailToPlayCalled || delegate.readyToPlayCalled {
+                        sawLoaderActivity = true
+                    }
+                    completedRounds += 1
+                }
+
+                expect(completedRounds).to(equal(rounds))
+                // Proves the resource loader path actually ran rather than the test passing vacuously.
+                expect(sawLoaderActivity).to(beTrue())
+            }
+
+            // Drops the item's last reference off-thread, so `deinit` can re-enter the delegate.
+            it("does not deadlock when the item is released during active loading") {
+                final class Holder {
+                    var item: CachingPlayerItem?
+                    var player: AVPlayer?
+                }
+
+                let rounds = 10
+                var completedRounds = 0
+
+                for round in 0..<rounds {
+                    let holder = Holder()
+                    holder.item = CachingPlayerItem(url: mediaURL)
+                    holder.player = AVPlayer(playerItem: holder.item)
+                    holder.player?.play()
+
+                    let warmup = Date().addingTimeInterval(0.2)
+                    while Date() < warmup {
+                        RunLoop.current.run(mode: .default, before: Date().addingTimeInterval(0.02))
+                    }
+
+                    let released = DispatchSemaphore(value: 0)
+                    DispatchQueue.global().async {
+                        holder.player?.replaceCurrentItem(with: nil)
+                        holder.player = nil
+                        holder.item = nil
+                        released.signal()
+                    }
+
+                    // Keep pumping main so queued loader callbacks run while deinit happens elsewhere.
+                    let deadline = Date().addingTimeInterval(20)
+                    var timedOut = false
+                    while released.wait(timeout: .now()) == .timedOut {
+                        if Date() > deadline {
+                            timedOut = true
+                            break
+                        }
+                        RunLoop.current.run(mode: .default, before: Date().addingTimeInterval(0.02))
+                    }
+
+                    if timedOut {
+                        fail("round \(round) release did not complete in 20s - probable deadlock")
+                        break
+                    }
+
+                    completedRounds += 1
+                }
+
+                expect(completedRounds).to(equal(rounds))
+            }
+        }
     }
 }
