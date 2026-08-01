@@ -22,7 +22,7 @@ CachingPlayerItem is a subclass of AVPlayerItem that lets you stream and cache m
 
 ## Requirements
 
-- iOS 10.0+ 
+- iOS 13.4+ 
 - Xcode 12.0+
 - Swift 5.0+
 
@@ -40,7 +40,7 @@ To integrate CachingPlayerItem into your Xcode project using CocoaPods, specify 
 
 ```ruby
 source 'https://github.com/CocoaPods/Specs.git'
-platform :ios, '10.0'
+platform :ios, '13.4'
 use_frameworks!
 
 target '<Your Target Name>' do
