@@ -1330,6 +1330,8 @@ class CachingPlayerItemPlaybackStressSpec: QuickSpec {
 
                 expect(delegate.didDownloadBytesCalled).to(beTrue())
                 expect(delegate.lastBytesExpected).to(equal(mediaData.count))
+                expect(delegate.lastBytesDownloaded).to(beGreaterThan(0))
+                expect(delegate.lastBytesDownloaded).to(beLessThanOrEqualTo(mediaData.count))
             }
 
             // The frame that crashed in issue #31, driven through a real player.

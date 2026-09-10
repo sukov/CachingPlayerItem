@@ -27,6 +27,13 @@ final class ResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URL
 
         return bufferData.count
     }
+    private var downloadedByteCountValue = 0
+    private var downloadedByteCount: Int {
+        bufferLock.lock()
+        defer { bufferLock.unlock() }
+
+        return downloadedByteCountValue
+    }
     private var configuration: CachingPlayerItemConfiguration { owner?.configuration ?? .default }
 
     private lazy var fileHandle = MediaFileHandle(filePath: saveFilePath)
@@ -154,7 +161,7 @@ final class ResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URL
             guard let self, let owner = self.owner else { return }
 
             owner.delegate?.playerItem?(owner,
-                                        didDownloadBytesSoFar: self.fileHandle.fileSize + self.bufferedByteCount,
+                                        didDownloadBytesSoFar: self.downloadedByteCount,
                                         outOf: Int(response.processedInfoData.expectedContentLength))
         }
     }
@@ -239,6 +246,7 @@ final class ResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URL
         if shouldResetData {
             bufferLock.lock()
             bufferData = Data()
+            downloadedByteCountValue = 0
             bufferLock.unlock()
 
             addOperationOnQueue { [weak self] in
@@ -287,6 +295,7 @@ final class ResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URL
         defer { bufferLock.unlock() }
 
         bufferData.append(data)
+        downloadedByteCountValue += data.count
     }
 
     private func writeBufferDataToFileIfNeeded(forced: Bool = false) {
