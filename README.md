@@ -1,11 +1,12 @@
 # CachingPlayerItem
 
-CachingPlayerItem is a subclass of AVPlayerItem that lets you stream and cache media content on iOS. Initial idea for this library was found [here](https://github.com/neekeetab/CachingPlayerItem).
+CachingPlayerItem is a subclass of AVPlayerItem that lets you stream and cache media content on iOS, macOS, tvOS and visionOS. Initial idea for this library was found [here](https://github.com/neekeetab/CachingPlayerItem).
 
+[![CI](https://github.com/sukov/CachingPlayerItem/actions/workflows/ci.yml/badge.svg)](https://github.com/sukov/CachingPlayerItem/actions/workflows/ci.yml)
 [![Version](https://img.shields.io/cocoapods/v/CachingPlayerItem.svg?style=flat)](https://cocoapods.org/pods/CachingPlayerItem)
 [![License](https://img.shields.io/cocoapods/l/CachingPlayerItem.svg?style=flat)](https://cocoapods.org/pods/CachingPlayerItem)
 [![Language Swift](https://img.shields.io/badge/Language-Swift%205.0-orange.svg?style=flat)](https://swift.org)
-[![Platform](https://img.shields.io/cocoapods/p/CachingPlayerItem.svg?style=flat)](https://cocoapods.org/pods/CachingPlayerItem)
+[![Platform](https://img.shields.io/badge/Platforms-iOS%20%7C%20macOS%20%7C%20tvOS%20%7C%20visionOS-blue?style=flat)](https://cocoapods.org/pods/CachingPlayerItem)
 [![Swift Package Manager](https://img.shields.io/badge/Swift_Package_Manager-compatible-orange?style=flat)](https://www.swift.org/package-manager)
 
 ## Features
@@ -22,7 +23,7 @@ CachingPlayerItem is a subclass of AVPlayerItem that lets you stream and cache m
 
 ## Requirements
 
-- iOS 10.0+ 
+- iOS 13.4+ / macOS 10.15.4+ / tvOS 13.4+ / visionOS 1.0+
 - Xcode 12.0+
 - Swift 5.0+
 
@@ -40,7 +41,7 @@ To integrate CachingPlayerItem into your Xcode project using CocoaPods, specify 
 
 ```ruby
 source 'https://github.com/CocoaPods/Specs.git'
-platform :ios, '10.0'
+platform :ios, '13.4'
 use_frameworks!
 
 target '<Your Target Name>' do

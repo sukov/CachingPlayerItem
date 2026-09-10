@@ -16,7 +16,7 @@ class PendingRequest {
     private let customHeaders: [String: String]?
     private var task: URLSessionTask?
     private var didCancelTask = false
-    fileprivate unowned var session: URLSession
+    fileprivate let session: URLSession
     let loadingRequest: AVAssetResourceLoadingRequest
     var isCancelled: Bool { loadingRequest.isCancelled || didCancelTask }
 
