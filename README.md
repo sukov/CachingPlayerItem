@@ -56,7 +56,7 @@ Once you have your Swift package set up, adding `CachingPlayerItem` as a depende
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/sukov/CachingPlayerItem.git", upToNextMajor(from: "2.2.0"))
+    .package(url: "https://github.com/sukov/CachingPlayerItem.git", upToNextMajor(from: "2.3.0"))
 ]
 ```
 
