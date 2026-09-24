@@ -7,20 +7,39 @@
 
 import Foundation
 import AVFoundation
+#if canImport(UIKit)
 import UIKit
+#elseif canImport(AppKit)
+import AppKit
+#endif
 
 /// Responsible for downloading media data and providing the requested data parts.
 final class ResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URLSessionDelegate, URLSessionDataDelegate, URLSessionTaskDelegate {
     typealias PendingRequestId = Int
 
-    private let lock = NSLock()
+    private let bufferLock = NSLock()
+    private let sessionLock = NSLock()
 
     private var bufferData = Data()
+    private var bufferedByteCount: Int {
+        bufferLock.lock()
+        defer { bufferLock.unlock() }
+
+        return bufferData.count
+    }
+    private var downloadedByteCountValue = 0
+    private var downloadedByteCount: Int {
+        bufferLock.lock()
+        defer { bufferLock.unlock() }
+
+        return downloadedByteCountValue
+    }
     private var configuration: CachingPlayerItemConfiguration { owner?.configuration ?? .default }
 
     private lazy var fileHandle = MediaFileHandle(filePath: saveFilePath)
 
     private var session: URLSession?
+    private var isSessionInvalidated = false
     private let operationQueue = {
         let queue = OperationQueue()
         queue.name = "CachingPlayerItemOperationQueue"
@@ -30,10 +49,37 @@ final class ResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URL
     private var pendingContentInfoRequest: PendingContentInfoRequest? {
         didSet { oldValue?.cancelTask() }
     }
-    private var contentInfoResponse: URLResponse?
+    private var contentInfoResponseValue: URLResponse?
+    private var contentInfoResponse: URLResponse? {
+        get {
+            sessionLock.lock()
+            defer { sessionLock.unlock() }
+
+            return contentInfoResponseValue
+        }
+
+        set {
+            sessionLock.lock()
+            defer { sessionLock.unlock() }
+
+            contentInfoResponseValue = newValue
+        }
+    }
     private var pendingDataRequests: [PendingRequestId: PendingDataRequest] = [:]
     private var fullMediaFileDownloadTask: URLSessionDataTask?
-    private(set) var isDownloadComplete = false
+    private var fullMediaFileDownloadTaskId: Int? {
+        sessionLock.lock()
+        defer { sessionLock.unlock() }
+
+        return fullMediaFileDownloadTask?.taskIdentifier
+    }
+    private var isDownloadCompleteValue = false
+    var isDownloadComplete: Bool {
+        sessionLock.lock()
+        defer { sessionLock.unlock() }
+
+        return isDownloadCompleteValue
+    }
 
     private let url: URL
     private let saveFilePath: String
@@ -47,22 +93,32 @@ final class ResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URL
         self.owner = owner
         super.init()
         
-        NotificationCenter.default.addObserver(self, selector: #selector(handleAppWillTerminate), name: UIApplication.willTerminateNotification, object: nil)
+        #if canImport(UIKit)
+        let willTerminateNotification = UIApplication.willTerminateNotification
+        #elseif canImport(AppKit)
+        let willTerminateNotification = NSApplication.willTerminateNotification
+        #endif
+
+        NotificationCenter.default.addObserver(self, selector: #selector(handleAppWillTerminate), name: willTerminateNotification, object: nil)
     }
 
     // MARK: AVAssetResourceLoaderDelegate
 
     func resourceLoader(_ resourceLoader: AVAssetResourceLoader, shouldWaitForLoadingOfRequestedResource loadingRequest: AVAssetResourceLoadingRequest) -> Bool {
-        if session == nil {
-            startFileDownload(with: url)
-        }
+        // Strong reference kept, owner's deinit re-locks (deadlocks) sessionLock on this thread.
+        let owner = self.owner
 
-        assert(session != nil, "Session must be set before proceeding.")
+        startFileDownload(with: url)
+
+        sessionLock.lock()
+        defer { sessionLock.unlock() }
+
         guard let session else { return false }
 
         if let _ = loadingRequest.contentInformationRequest {
-            pendingContentInfoRequest = PendingContentInfoRequest(url: url, session: session, loadingRequest: loadingRequest, customHeaders: owner?.urlRequestHeaders)
-            pendingContentInfoRequest?.startTask()
+            let request = PendingContentInfoRequest(url: url, session: session, loadingRequest: loadingRequest, customHeaders: owner?.urlRequestHeaders)
+            addOperationOnQueue { [weak self] in self?.pendingContentInfoRequest = request }
+            request.startTask()
             return true
         } else if let _ = loadingRequest.dataRequest {
             let request = PendingDataRequest(url: url, session: session, loadingRequest: loadingRequest, customHeaders: owner?.urlRequestHeaders)
@@ -94,17 +150,19 @@ final class ResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URL
             pendingDataRequests[dataTask.taskIdentifier]?.respond(withRemoteData: data)
         }
 
-        if fullMediaFileDownloadTask?.taskIdentifier == dataTask.taskIdentifier {
-            bufferData.append(data)
-            writeBufferDataToFileIfNeeded()
+        guard fullMediaFileDownloadTaskId == dataTask.taskIdentifier else { return }
 
-            guard let response = contentInfoResponse ?? dataTask.response else { return }
+        appendDataToBuffer(data)
+        writeBufferDataToFileIfNeeded()
 
-            DispatchQueue.main.async {
-                self.owner?.delegate?.playerItem?(self.owner!,
-                                                  didDownloadBytesSoFar: self.fileHandle.fileSize + self.bufferData.count,
-                                                  outOf: Int(response.processedInfoData.expectedContentLength))
-            }
+        guard let response = contentInfoResponse ?? dataTask.response else { return }
+
+        DispatchQueue.main.async { [weak self] in
+            guard let self, let owner = self.owner else { return }
+
+            owner.delegate?.playerItem?(owner,
+                                        didDownloadBytesSoFar: self.downloadedByteCount,
+                                        outOf: Int(response.processedInfoData.expectedContentLength))
         }
     }
 
@@ -120,7 +178,7 @@ final class ResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URL
                 if pendingContentInfoRequest?.id == taskId {
                     finishLoadingPendingRequest(withId: taskId, error: error)
                     downloadFailed(with: error)
-                } else if fullMediaFileDownloadTask?.taskIdentifier == taskId {
+                } else if fullMediaFileDownloadTaskId == taskId {
                     downloadFailed(with: error)
                 }  else {
                     finishLoadingPendingRequest(withId: taskId, error: error)
@@ -143,9 +201,9 @@ final class ResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URL
                 finishLoadingPendingRequest(withId: taskId)
             }
 
-            guard fullMediaFileDownloadTask?.taskIdentifier == taskId else { return }
+            guard fullMediaFileDownloadTaskId == taskId else { return }
 
-            if bufferData.count > 0 {
+            if bufferedByteCount > 0 {
                 writeBufferDataToFileIfNeeded(forced: true)
             }
 
@@ -163,7 +221,10 @@ final class ResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URL
     // MARK: Internal methods
 
     func startFileDownload(with url: URL) {
-        guard session == nil else { return }
+        sessionLock.lock()
+        defer { sessionLock.unlock() }
+
+        guard session == nil && isSessionInvalidated == false else { return }
 
         createURLSession()
 
@@ -175,12 +236,19 @@ final class ResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URL
     }
 
     func invalidateAndCancelSession(shouldResetData: Bool = true) {
+        sessionLock.lock()
         session?.invalidateAndCancel()
         session = nil
+        sessionLock.unlock()
+
         operationQueue.cancelAllOperations()
 
         if shouldResetData {
+            bufferLock.lock()
             bufferData = Data()
+            downloadedByteCountValue = 0
+            bufferLock.unlock()
+
             addOperationOnQueue { [weak self] in
                 guard let self else { return }
 
@@ -192,7 +260,11 @@ final class ResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URL
         // We need to only remove the file if it hasn't been fully downloaded
         guard isDownloadComplete == false else { return }
 
-        fileHandle.deleteFile()
+        if shouldResetData {
+            fileHandle.reset()
+        } else {
+            fileHandle.deleteFile()
+        }
     }
 
     // MARK: Private methods
@@ -218,18 +290,45 @@ final class ResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URL
         }
     }
 
+    private func appendDataToBuffer(_ data: Data) {
+        bufferLock.lock()
+        defer { bufferLock.unlock() }
+
+        bufferData.append(data)
+        downloadedByteCountValue += data.count
+    }
+
     private func writeBufferDataToFileIfNeeded(forced: Bool = false) {
-        lock.lock()
-        defer { lock.unlock() }
+        let downloadBufferLimit = configuration.downloadBufferLimit
 
-        guard bufferData.count >= configuration.downloadBufferLimit || forced else { return }
+        bufferLock.lock()
 
-        fileHandle.append(data: bufferData)
-        bufferData = Data()
+        guard bufferData.count >= downloadBufferLimit || forced else {
+            bufferLock.unlock()
+            return
+        }
+
+        var error: Error?
+
+        do {
+            try fileHandle.append(data: bufferData)
+            bufferData = Data()
+        } catch let appendError {
+            error = appendError
+        }
+
+        bufferLock.unlock()
+
+        if let error {
+            AppLogger.error("Failed writing buffered data to \(saveFilePath) with error: \(error)")
+            downloadFailed(with: error)
+        }
     }
 
     private func downloadComplete() {
-        isDownloadComplete = true
+        sessionLock.lock()
+        isDownloadCompleteValue = true
+        sessionLock.unlock()
 
         DispatchQueue.main.async {
             self.owner?.delegate?.playerItem?(self.owner!, didFinishDownloadingFileAt: self.saveFilePath)
@@ -269,6 +368,10 @@ final class ResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URL
     }
 
     private func downloadFailed(with error: Error) {
+        sessionLock.lock()
+        isSessionInvalidated = true
+        sessionLock.unlock()
+
         invalidateAndCancelSession()
 
         DispatchQueue.main.async {

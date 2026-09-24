@@ -60,32 +60,53 @@ extension MediaFileHandle {
         lock.lock()
         defer { lock.unlock() }
 
-        readHandle?.seek(toFileOffset: UInt64(offset))
-        return readHandle?.readData(ofLength: length)
+        guard let readHandle else { return nil }
+
+        do {
+            try readHandle.seek(toOffset: UInt64(offset))
+            return try readHandle.read(upToCount: length)
+        } catch {
+            AppLogger.error("Failed reading \(length) bytes at offset \(offset) from \(filePath) with error: \(error)")
+            return nil
+        }
     }
 
-    func append(data: Data) {
+    func append(data: Data) throws {
         lock.lock()
         defer { lock.unlock() }
 
-        guard let writeHandle = writeHandle else { return }
+        guard let writeHandle else { return }
 
-        writeHandle.seekToEndOfFile()
-        writeHandle.write(data)
+        try writeHandle.seekToEnd()
+        try writeHandle.write(contentsOf: data)
     }
 
     func synchronize() {
         lock.lock()
         defer { lock.unlock() }
 
-        guard let writeHandle = writeHandle else { return }
-
-        writeHandle.synchronizeFile()
+        try? writeHandle?.synchronize()
     }
 
     func close() {
-        readHandle?.closeFile()
-        writeHandle?.closeFile()
+        try? readHandle?.close()
+        try? writeHandle?.close()
+    }
+
+    func reset() {
+        lock.lock()
+        defer { lock.unlock() }
+
+        close()
+
+        if FileManager.default.fileExists(atPath: filePath) {
+            deleteFile()
+        }
+
+        FileManager.default.createFile(atPath: filePath, contents: nil, attributes: nil)
+
+        readHandle = FileHandle(forReadingAtPath: filePath)
+        writeHandle = FileHandle(forWritingAtPath: filePath)
     }
 
     func deleteFile() {

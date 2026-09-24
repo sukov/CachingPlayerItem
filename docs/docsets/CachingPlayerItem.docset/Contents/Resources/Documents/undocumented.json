@@ -30,7 +30,7 @@
     },
     {
       "file": "/Users/shukov/Projects/CachingPlayerItem/Source/CachingPlayerItem.swift",
-      "line": 252,
+      "line": 281,
       "symbol": "CachingPlayerItem.observeValue(forKeyPath:of:change:context:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"

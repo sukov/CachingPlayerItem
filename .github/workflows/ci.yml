@@ -1,0 +1,75 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+  pull_request:
+    branches: [master]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Test (iOS)
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install pods
+        working-directory: Example
+        run: pod install
+
+      - name: Pick an iOS simulator
+        id: simulator
+        run: |
+          UDID=$(xcrun simctl list devices available --json | python3 -c '
+          import json, sys
+          for runtime, devices in json.load(sys.stdin)["devices"].items():
+              if "iOS" not in runtime:
+                  continue
+              for device in devices:
+                  if "iPhone" in device["name"]:
+                      print(device["udid"])
+                      raise SystemExit
+          raise SystemExit("no iPhone simulator available")
+          ')
+          echo "udid=$UDID" >> "$GITHUB_OUTPUT"
+
+      - name: Test
+        working-directory: Example
+        run: |
+          xcodebuild test \
+            -workspace CachingPlayerItem.xcworkspace \
+            -scheme CachingPlayerItem-Example \
+            -destination "id=${{ steps.simulator.outputs.udid }}"
+
+  build:
+    name: Build (${{ matrix.platform }})
+    runs-on: macos-15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: macOS
+            destination: platform=macOS
+          - platform: tvOS
+            destination: generic/platform=tvOS Simulator
+          - platform: visionOS
+            destination: generic/platform=visionOS Simulator
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build
+        run: |
+          xcodebuild -quiet \
+            -scheme CachingPlayerItem \
+            -destination '${{ matrix.destination }}'

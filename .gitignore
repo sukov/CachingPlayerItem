@@ -1,2 +1,12 @@
 ## User settings
 xcuserdata/
+
+## macOS
+.DS_Store
+
+## Xcode
+DerivedData/
+
+## Swift Package Manager
+.build/
+.swiftpm/
