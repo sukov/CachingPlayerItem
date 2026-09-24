@@ -1,0 +1,27 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to push to CocoaPods trunk'
+        required: true
+
+jobs:
+  trunk-push:
+    name: Push to CocoaPods trunk
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+
+      - name: List simulator runtimes
+        run: xcrun simctl list runtimes
+
+      - name: Push to CocoaPods trunk
+        env:
+          COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
+        run: pod trunk push CachingPlayerItem.podspec --allow-warnings
